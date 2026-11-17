@@ -5,7 +5,6 @@ import {
   createTypeSpecLibrary,
   emitFile,
   getAutoDecoratorValue,
-  getNamespaceFullName,
   getTypeName,
   isTemplateInstance,
   isType,
@@ -19,6 +18,7 @@ import {
   type Scalar,
   type Union,
 } from "@typespec/compiler";
+import { isCategoryDecorator } from "./category.js";
 import { Reference } from "./reference.js";
 
 export type Declaration = Model | Enum | Union | Scalar;
@@ -64,11 +64,7 @@ function getCategory(
   }
 
   // Template declarations retain their decorators without executing them.
-  const application = type.decorators.find(
-    ({ definition }) =>
-      definition?.name === "@category" &&
-      getNamespaceFullName(definition.namespace) === "AgentHooks.Docs",
-  );
+  const application = type.decorators.find(isCategoryDecorator);
   const argument = application?.args[0]?.value;
   return argument && isType(argument) && argument.kind === "EnumMember"
     ? argument

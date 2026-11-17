@@ -28,6 +28,7 @@ import {
   type Type,
 } from "@typespec/compiler";
 import { getExtensions, getUniqueItems, isOneOf } from "@typespec/json-schema";
+import { isCategoryDecorator } from "./category.js";
 import type { Declaration } from "./index.js";
 
 interface ReferenceProps {
@@ -203,6 +204,45 @@ export function Reference(props: ReferenceProps) {
     return values.join("; ");
   }
 
+  function sourceSnippet(type: Declaration): string {
+    const source = getSourceLocation(type, { locateId: false });
+    if (source.isSynthetic) {
+      throw new Error(`No TypeSpec source found for ${getTypeName(type)}.`);
+    }
+
+    const ranges = new Map<number, number>();
+    for (const application of type.decorators) {
+      if (!isCategoryDecorator(application) || !application.node) continue;
+      const location = getSourceLocation(application.node);
+      if (
+        !location.isSynthetic &&
+        location.file === source.file &&
+        location.pos >= source.pos &&
+        location.end <= source.end
+      ) {
+        ranges.set(location.pos - source.pos, location.end - source.pos);
+      }
+    }
+
+    let text = source.file.text.slice(source.pos, source.end);
+    for (const [start, end] of [...ranges].sort((a, b) => b[0] - a[0])) {
+      const lineStart = text.lastIndexOf("\n", start - 1) + 1;
+      const nextLine = text.indexOf("\n", end);
+      const lineEnd = nextLine === -1 ? text.length : nextLine;
+      if (
+        !text.slice(lineStart, start).trim() &&
+        !text.slice(end, lineEnd).trim()
+      ) {
+        text =
+          text.slice(0, lineStart) +
+          text.slice(nextLine === -1 ? lineEnd : nextLine + 1);
+      } else {
+        text = text.slice(0, start) + text.slice(end).replace(/^[ \t]+/, "");
+      }
+    }
+    return text.trim();
+  }
+
   function DeclarationDoc({
     type,
     tables,
@@ -213,24 +253,14 @@ export function Reference(props: ReferenceProps) {
     const examples = getExamples(program, type);
     const model = type.kind === "Model" ? type : undefined;
     const properties = model ? propertyDocs(model) : [];
-    const source =
-      !tables || isTemplateDeclaration(type)
-        ? getSourceLocation(type, { locateId: false })
-        : undefined;
-    if (source?.isSynthetic) {
-      throw new Error(`No TypeSpec source found for ${getTypeName(type)}.`);
-    }
+    const showSource = !tables || isTemplateDeclaration(type);
     return (
       <md.Section
         heading={inline(getTypeName(type, { namespaceFilter: () => false }))}
       >
         {`<a id="${anchor(type)}"></a>`}
         {doc(type)}
-        {source && (
-          <md.Code lang="typespec">
-            {source.file.text.slice(source.pos, source.end).trim()}
-          </md.Code>
-        )}
+        {showSource && <md.Code lang="typespec">{sourceSnippet(type)}</md.Code>}
         {constraints(type)}
         {model?.baseModel && <>Extends {typeExpression(model.baseModel)}.</>}
         {model?.indexer && (

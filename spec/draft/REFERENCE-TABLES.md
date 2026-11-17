@@ -288,7 +288,6 @@ Metadata available at every interception point.
 <a id="agenthooks-hooksrequest"></a>
 
 ```typespec
-@category(Categories.Requests)
 model HooksRequest<TPoint extends InterceptionPoint = InterceptionPoint> {
   ...ContextMetadata;
   interception_point: TPoint;
@@ -768,7 +767,6 @@ Hook response envelope with a hook-specific verdict.
 ```typespec
 /** Hook response envelope with a hook-specific verdict. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model HookResponse<TVerdict> {
   verdict: TVerdict;
   extensions?: Extensions;
@@ -1020,7 +1018,6 @@ transform: proceed with the hook-specific replacement payload.
 ```typespec
 /** transform: proceed with the hook-specific replacement payload. */
 @extension("additionalProperties", false)
-@category(Categories.Verdicts)
 model TransformVerdict<TTransform> {
   ...VerdictBase;
   decision: Decision.Transform;

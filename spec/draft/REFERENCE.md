@@ -32,7 +32,6 @@ Composition profiles (§7.1), in §7.2 table order.
 
 ```typespec
 /** Composition profiles (§7.1), in §7.2 table order. */
-@category(Categories.Common)
 enum CompositionProfile {
   SequentialFirstDeny: "sequential/first_deny",
   SequentialRunAll: "sequential/run_all",
@@ -65,7 +64,6 @@ Values of the on_disagreement and on_transform_conflict knobs (§7.2).
 
 ```typespec
 /** Values of the on_disagreement and on_transform_conflict knobs (§7.2). */
-@category(Categories.Common)
 enum ConflictResolution {
   Deny: "deny",
   Approval: "approval",
@@ -93,7 +91,6 @@ namespace rule.
  * namespace rule.
  */
 @extension("propertyNames", #{ pattern: "^[a-z][a-z0-9_]*$" })
-@category(Categories.Common)
 model Extensions is Record<unknown>;
 ```
 
@@ -110,7 +107,6 @@ The closed set of agent lifecycle interception points (AGENT-HOOKS-0.1 §3).
 ```typespec
 /** The closed set of agent lifecycle interception points (AGENT-HOOKS-0.1 §3). */
 @summary("Agent Hooks — interception point")
-@category(Categories.Common)
 enum InterceptionPoint {
   AgentStartup: "agent_startup",
   Input: "input",
@@ -163,7 +159,6 @@ An open JSON object, not an arbitrary JSON value.
 
 ```typespec
 /** An open JSON object, not an arbitrary JSON value. */
-@category(Categories.Common)
 model JsonObject {}
 ```
 
@@ -177,7 +172,6 @@ Enforcement modes (§8).
 
 ```typespec
 /** Enforcement modes (§8). */
-@category(Categories.Common)
 enum Mode {
   Enforce: "enforce",
   EvaluateOnly: "evaluate_only",
@@ -200,7 +194,6 @@ Values of the on_approval knob (§7.2).
 
 ```typespec
 /** Values of the on_approval knob (§7.2). */
-@category(Categories.Common)
 enum OnApproval {
   Stop: "stop",
   Resume: "resume",
@@ -252,7 +245,6 @@ Who acts (§4.5).
 
 ```typespec
 /** Who acts (§4.5). */
-@category(Categories.Requests)
 enum ActorKind {
   Human: "human",
   Service: "service",
@@ -287,7 +279,6 @@ metadata and optional namespaced extensions.
  * metadata and optional namespaced extensions.
  */
 @summary("Agent Hooks — agent context")
-@category(Categories.Requests)
 union AgentContext {
   AgentStartupRequest,
   InputRequest,
@@ -317,7 +308,6 @@ Conditional payload of agent_startup (§4.2).
 
 ```typespec
 /** Conditional payload of agent_startup (§4.2). */
-@category(Categories.Requests)
 model AgentInit {
   tools_registered: string[];
 }
@@ -335,7 +325,6 @@ The request at agent_shutdown: summary is required (§4.2).
 
 ```typespec
 /** The request at agent_shutdown: summary is required (§4.2). */
-@category(Categories.Requests)
 model AgentShutdownRequest {
   ...HooksRequest<InterceptionPoint.AgentShutdown>;
   summary: Summary;
@@ -483,7 +472,6 @@ The request at agent_startup: agent_init is required (§4.2).
 
 ```typespec
 /** The request at agent_startup: agent_init is required (§4.2). */
-@category(Categories.Requests)
 model AgentStartupRequest {
   ...HooksRequest<InterceptionPoint.AgentStartup>;
   agent_init: AgentInit;
@@ -631,7 +619,6 @@ Metadata available at every interception point.
 
 ```typespec
 /** Metadata available at every interception point. */
-@category(Categories.Requests)
 model ContextMetadata {
   /**
    * This version's wire string (§4.1). A released version's contexts
@@ -812,7 +799,6 @@ Type: `float64`.
 <a id="agenthooks-hooksrequest"></a>
 
 ```typespec
-@category(Categories.Requests)
 model HooksRequest<TPoint extends InterceptionPoint = InterceptionPoint> {
   ...ContextMetadata;
   interception_point: TPoint;
@@ -957,7 +943,6 @@ Conditional payload of input (§4.2).
 
 ```typespec
 /** Conditional payload of input (§4.2). */
-@category(Categories.Requests)
 model Input {
   content: unknown;
   role: InputRole;
@@ -980,7 +965,6 @@ The request at input: input is required (§4.2).
 
 ```typespec
 /** The request at input: input is required (§4.2). */
-@category(Categories.Requests)
 model InputRequest {
   ...HooksRequest<InterceptionPoint.Input>;
   input: Input;
@@ -1128,7 +1112,6 @@ Who produced an input (§4.2).
 
 ```typespec
 /** Who produced an input (§4.2). */
-@category(Categories.Requests)
 enum InputRole {
   User: "user",
   System: "system",
@@ -1156,7 +1139,6 @@ One message of the model request (§4.2).
 
 ```typespec
 /** One message of the model request (§4.2). */
-@category(Categories.Requests)
 model Message {
   role: string;
   content: unknown;
@@ -1179,7 +1161,6 @@ Conditional payload of pre_model_call and post_model_call (§4.2).
 
 ```typespec
 /** Conditional payload of pre_model_call and post_model_call (§4.2). */
-@category(Categories.Requests)
 model Model {
   id: string;
   vendor?: string;
@@ -1207,7 +1188,6 @@ Conditional payload of output (§4.2).
 
 ```typespec
 /** Conditional payload of output (§4.2). */
-@category(Categories.Requests)
 model Output {
   content: unknown;
 }
@@ -1225,7 +1205,6 @@ The request at output: output is required (§4.2).
 
 ```typespec
 /** The request at output: output is required (§4.2). */
-@category(Categories.Requests)
 model OutputRequest {
   ...HooksRequest<InterceptionPoint.Output>;
   output: Output;
@@ -1373,7 +1352,6 @@ The request at post_model_call: model and response are required (§4.2).
 
 ```typespec
 /** The request at post_model_call: model and response are required (§4.2). */
-@category(Categories.Requests)
 model PostModelCallRequest {
   ...HooksRequest<InterceptionPoint.PostModelCall>;
   `model`: Model;
@@ -1536,7 +1514,6 @@ The request at post_tool_call: tool_call and tool_result are required (§4.2).
 
 ```typespec
 /** The request at post_tool_call: tool_call and tool_result are required (§4.2). */
-@category(Categories.Requests)
 model PostToolCallRequest {
   ...HooksRequest<InterceptionPoint.PostToolCall>;
   tool_call: ToolCall;
@@ -1689,7 +1666,6 @@ The request at pre_model_call: model and messages are required (§4.2).
 
 ```typespec
 /** The request at pre_model_call: model and messages are required (§4.2). */
-@category(Categories.Requests)
 model PreModelCallRequest {
   ...HooksRequest<InterceptionPoint.PreModelCall>;
   `model`: Model;
@@ -1852,7 +1828,6 @@ The request at pre_tool_call: tool_call is required (§4.2).
 
 ```typespec
 /** The request at pre_tool_call: tool_call is required (§4.2). */
-@category(Categories.Requests)
 model PreToolCallRequest {
   ...HooksRequest<InterceptionPoint.PreToolCall>;
   tool_call: ToolCall;
@@ -2000,7 +1975,6 @@ Conditional payload of post_model_call (§4.2).
 
 ```typespec
 /** Conditional payload of post_model_call (§4.2). */
-@category(Categories.Requests)
 model Response {
   content: unknown;
   tool_calls: ToolCallRequest[];
@@ -2028,7 +2002,6 @@ Conditional payload of agent_shutdown (§4.2).
 
 ```typespec
 /** Conditional payload of agent_shutdown (§4.2). */
-@category(Categories.Requests)
 model Summary {
   reason: SummaryReason;
 
@@ -2073,7 +2046,6 @@ Why the agent stopped (§4.2).
 
 ```typespec
 /** Why the agent stopped (§4.2). */
-@category(Categories.Requests)
 enum SummaryReason {
   Completed: "completed",
   Error: "error",
@@ -2101,7 +2073,6 @@ Conditional payload of pre_tool_call and post_tool_call (§4.2).
 
 ```typespec
 /** Conditional payload of pre_tool_call and post_tool_call (§4.2). */
-@category(Categories.Requests)
 model ToolCall {
   @minLength(1)
   id: string;
@@ -2146,7 +2117,6 @@ One tool call the model asked for (§4.2).
 
 ```typespec
 /** One tool call the model asked for (§4.2). */
-@category(Categories.Requests)
 model ToolCallRequest {
   id?: string;
   name: string;
@@ -2174,7 +2144,6 @@ One declared tool (§4.3).
 
 ```typespec
 /** One declared tool (§4.3). */
-@category(Categories.Requests)
 model ToolDecl {
   name: string;
   description?: string;
@@ -2202,7 +2171,6 @@ Conditional payload of post_tool_call (§4.2).
 
 ```typespec
 /** Conditional payload of post_tool_call (§4.2). */
-@category(Categories.Requests)
 model ToolResult {
   value: unknown;
   is_error: boolean;
@@ -2234,7 +2202,6 @@ Token usage of a model call (§4.3).
 
 ```typespec
 /** Token usage of a model call (§4.3). */
-@category(Categories.Requests)
 model Usage {
   @minValue(0)
   prompt_tokens?: integer;
@@ -2282,7 +2249,6 @@ agent_shutdown response: transforms are forbidden.
 
 ```typespec
 /** agent_shutdown response: transforms are forbidden. */
-@category(Categories.Responses)
 model AgentShutdownHookResponse is HookResponse<NonTransformVerdict>;
 ```
 
@@ -2304,7 +2270,6 @@ agent_startup response: transforms are forbidden.
 
 ```typespec
 /** agent_startup response: transforms are forbidden. */
-@category(Categories.Responses)
 model AgentStartupHookResponse is HookResponse<NonTransformVerdict>;
 ```
 
@@ -2327,7 +2292,6 @@ Hook response envelope with a hook-specific verdict.
 ```typespec
 /** Hook response envelope with a hook-specific verdict. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model HookResponse<TVerdict> {
   verdict: TVerdict;
   extensions?: Extensions;
@@ -2350,7 +2314,6 @@ input response.
 
 ```typespec
 /** input response. */
-@category(Categories.Responses)
 model InputHookResponse is HookResponse<Verdict<InputHookTransform>>;
 ```
 
@@ -2373,7 +2336,6 @@ Replaces the complete input payload.
 ```typespec
 /** Replaces the complete input payload. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model InputHookTransform {
   input: InputRequest.input;
 }
@@ -2393,7 +2355,6 @@ output response.
 
 ```typespec
 /** output response. */
-@category(Categories.Responses)
 model OutputHookResponse is HookResponse<Verdict<OutputHookTransform>>;
 ```
 
@@ -2416,7 +2377,6 @@ Replaces the complete output payload.
 ```typespec
 /** Replaces the complete output payload. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model OutputHookTransform {
   output: OutputRequest.output;
 }
@@ -2436,7 +2396,6 @@ post_model_call response.
 
 ```typespec
 /** post_model_call response. */
-@category(Categories.Responses)
 model PostModelHookResponse is HookResponse<Verdict<PostModelHookTransform>>;
 ```
 
@@ -2459,7 +2418,6 @@ Replaces the complete model response payload.
 ```typespec
 /** Replaces the complete model response payload. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model PostModelHookTransform {
   response: PostModelCallRequest.response;
 }
@@ -2479,7 +2437,6 @@ post_tool_call response.
 
 ```typespec
 /** post_tool_call response. */
-@category(Categories.Responses)
 model PostToolHookResponse is HookResponse<Verdict<PostToolHookTransform>>;
 ```
 
@@ -2502,7 +2459,6 @@ Replaces only the value of the tool result.
 ```typespec
 /** Replaces only the value of the tool result. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model PostToolHookTransform {
   value: ToolResult.value;
 }
@@ -2522,7 +2478,6 @@ pre_model_call response.
 
 ```typespec
 /** pre_model_call response. */
-@category(Categories.Responses)
 model PreModelHookResponse is HookResponse<Verdict<PreModelHookTransform>>;
 ```
 
@@ -2545,7 +2500,6 @@ Replaces the complete model-message array.
 ```typespec
 /** Replaces the complete model-message array. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model PreModelHookTransform {
   messages: PreModelCallRequest.messages;
 }
@@ -2565,7 +2519,6 @@ pre_tool_call response.
 
 ```typespec
 /** pre_tool_call response. */
-@category(Categories.Responses)
 model PreToolHookResponse is HookResponse<Verdict<PreToolHookTransform>>;
 ```
 
@@ -2588,7 +2541,6 @@ Replaces the complete tool args for the pre-tool hook.
 ```typespec
 /** Replaces the complete tool args for the pre-tool hook. */
 @extension("additionalProperties", false)
-@category(Categories.Responses)
 model PreToolHookTransform {
   args: ToolCall.args;
 }
@@ -2621,7 +2573,6 @@ allow: proceed. Absorbs warn through warnings[] (§5.1).
 ```typespec
 /** allow: proceed. Absorbs warn through warnings[] (§5.1). */
 @extension("additionalProperties", false)
-@category(Categories.Verdicts)
 model AllowVerdict {
   ...VerdictBase;
   decision: Decision.Allow;
@@ -2676,7 +2627,6 @@ The three decisions (§5).
 
 ```typespec
 /** The three decisions (§5). */
-@category(Categories.Verdicts)
 enum Decision {
   Allow: "allow",
   Deny: "deny",
@@ -2705,7 +2655,6 @@ deny: stop the action. Absorbs escalate through the approval block (§5.1).
 ```typespec
 /** deny: stop the action. Absorbs escalate through the approval block (§5.1). */
 @extension("additionalProperties", false)
-@category(Categories.Verdicts)
 model DenyVerdict {
   ...VerdictBase;
   decision: Decision.Deny;
@@ -2774,7 +2723,6 @@ Offline-verifiable evidence attached to a verdict (§14).
 ```typespec
 /** Offline-verifiable evidence attached to a verdict (§14). */
 @extension("additionalProperties", false)
-@category(Categories.Verdicts)
 model Evidence {
   /** Content address (sha256:<hex>) or URI of an offline-verifiable proof. */
   artefact?: string | null;
@@ -2803,7 +2751,6 @@ Verdict choices for hooks that do not support transforms.
 
 ```typespec
 /** Verdict choices for hooks that do not support transforms. */
-@category(Categories.Verdicts)
 union NonTransformVerdict {
   AllowVerdict,
   DenyVerdict,
@@ -2822,7 +2769,6 @@ transform: proceed with the hook-specific replacement payload.
 ```typespec
 /** transform: proceed with the hook-specific replacement payload. */
 @extension("additionalProperties", false)
-@category(Categories.Verdicts)
 model TransformVerdict<TTransform> {
   ...VerdictBase;
   decision: Decision.Transform;
@@ -2880,7 +2826,6 @@ Members every decision may carry.
 
 ```typespec
 /** Members every decision may carry. */
-@category(Categories.Verdicts)
 model VerdictBase {
   /**
    * Interceptor-supplied machine identifier. The host_error: prefix is reserved
@@ -2951,7 +2896,6 @@ Named URIs an auditor MAY consult. Hosts MUST NOT dereference automatically (§1
 
 ```typespec
 /** Named URIs an auditor MAY consult. Hosts MUST NOT dereference automatically (§14). */
-@category(Categories.Verdicts)
 model VerificationPointers is Record<string>;
 ```
 
@@ -2966,7 +2910,6 @@ A recorded concern that does not affect control flow (§5.1).
 ```typespec
 /** A recorded concern that does not affect control flow (§5.1). */
 @extension("additionalProperties", false)
-@category(Categories.Verdicts)
 model Warning {
   /**
    * Interceptor-supplied warning identifier. The host_error: prefix is reserved
@@ -3018,7 +2961,6 @@ approve: the resolver lifts the deny with an allow verdict.
 ```typespec
 /** approve: the resolver lifts the deny with an allow verdict. */
 @extension("additionalProperties", false)
-@category(Categories.Approval)
 model ApproveResolution {
   ...ResolutionBase;
   outcome: Outcome.Approve;
@@ -3061,7 +3003,6 @@ host_error:*.
  * member is validated against the §5 schema only when its reason is not
  * host_error:*.
  */
-@category(Categories.Approval)
 model LiftableDeny {
   decision: Decision.Deny;
   ...Record<unknown>;
@@ -3082,7 +3023,6 @@ How a consultation ended (§9).
 
 ```typespec
 /** How a consultation ended (§9). */
-@category(Categories.Approval)
 enum Outcome {
   Approve: "approve",
   Reject: "reject",
@@ -3111,7 +3051,6 @@ reject: the resolver keeps a deny.
 ```typespec
 /** reject: the resolver keeps a deny. */
 @extension("additionalProperties", false)
-@category(Categories.Approval)
 model RejectResolution {
   ...ResolutionBase;
   outcome: Outcome.Reject;
@@ -3145,7 +3084,6 @@ What the host hands the resolver (§9).
 ```typespec
 /** What the host hands the resolver (§9). */
 @extension("additionalProperties", false)
-@category(Categories.Approval)
 model request {
   context_identity: string | null;
   interception_point: InterceptionPoint;
@@ -3184,7 +3122,6 @@ What the resolver returns (§9).
 
 ```typespec
 /** What the resolver returns (§9). */
-@category(Categories.Approval)
 union resolution {
   ApproveResolution,
   RejectResolution,
@@ -3201,7 +3138,6 @@ union resolution {
 <a id="agenthooks-resolutionbase"></a>
 
 ```typespec
-@category(Categories.Approval)
 model ResolutionBase {
   /**
    * MUST equal the request's context_identity byte for byte (echo rule, §9);
@@ -3227,7 +3163,6 @@ unresolved: no decision; the deny stands and no verdict is carried.
 ```typespec
 /** unresolved: no decision; the deny stands and no verdict is carried. */
 @extension("additionalProperties", false)
-@category(Categories.Approval)
 model UnresolvedResolution {
   ...ResolutionBase;
   outcome: Outcome.Unresolved;
@@ -3267,7 +3202,6 @@ Presence only; members are stripped by the projection.
 ```typespec
 /** Presence only; members are stripped by the projection. */
 @extension("additionalProperties", false)
-@category(Categories.Records)
 model ApprovalPresence {}
 ```
 
@@ -3339,7 +3273,6 @@ null when identity_provider is null (§10.3).
     }
   ]
 )
-@category(Categories.Records)
 model InterceptionRecord {
   interception_point: InterceptionPoint;
   mode: Mode;
@@ -3557,7 +3490,6 @@ Consultation outcomes a record names (§7.6).
 
 ```typespec
 /** Consultation outcomes a record names (§7.6). */
-@category(Categories.Records)
 enum ResolvedBy {
   Approval: "approval",
   Rejection: "rejection",
@@ -3580,7 +3512,6 @@ The host_error reasons a continue posture may substitute for (§6.3.1).
 
 ```typespec
 /** The host_error reasons a continue posture may substitute for (§6.3.1). */
-@category(Categories.Records)
 enum SubstitutedFor {
   InterceptorFailed: "host_error:interceptor_failed",
   InterceptorTimeout: "host_error:interceptor_timeout",
@@ -3613,7 +3544,6 @@ W3C Trace Context identifiers echoed from the context's optional trace block
  * (§4.5, §10.3).
  */
 @extension("additionalProperties", false)
-@category(Categories.Records)
 model Trace {
   trace_id?: string;
   span_id?: string;
@@ -3647,7 +3577,6 @@ warnings[].reason may carry host_warning:control_failed (§6.3.1, §11.1).
  * warnings[].reason may carry host_warning:control_failed (§6.3.1, §11.1).
  */
 @extension("additionalProperties", false)
-@category(Categories.Records)
 model VerdictProjection {
   decision: Decision;
   reason?: string | null;
@@ -3698,7 +3627,6 @@ Payload-free summary of one interceptor's verdict (§10.3).
 ```typespec
 /** Payload-free summary of one interceptor's verdict (§10.3). */
 @extension("additionalProperties", false)
-@category(Categories.Records)
 model VerdictSlot {
   @minValue(0)
   index: integer;
@@ -3757,7 +3685,6 @@ Warning metadata retained in a payload-free record projection.
 ```typespec
 /** Warning metadata retained in a payload-free record projection. */
 @extension("additionalProperties", false)
-@category(Categories.Records)
 model WarningProjection {
   reason?: string | null;
   message?: string | null;
@@ -3808,7 +3735,6 @@ Type: `string` | `null`.
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model ApprovalConfig {
   /**
    * §9. A registered approval resolver by reference, or null: liftable denies
@@ -3851,7 +3777,6 @@ One interceptor binding (§7.7.4).
 ```typespec
 /** One interceptor binding (§7.7.4). */
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model Binding {
   /** Unique in the array; stamped on verdicts[].name (§10.3). */
   id: Reference;
@@ -3952,7 +3877,6 @@ Type: [`OnError`](#agenthooks-onerror).
 ```typespec
 @minValue(1)
 @maxValue(3600000)
-@category(Categories.Declaration)
 scalar BoundedTimeoutMs extends integer;
 ```
 
@@ -3973,7 +3897,6 @@ exposure_bound is absent.
  * exposure_bound is absent.
  */
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model BufferedSurface {
   ...SurfaceBase;
 
@@ -4026,7 +3949,6 @@ host_declaration.
  * less buffered_output, which is the boolean surface member, plus
  * host_declaration.
  */
-@category(Categories.Declaration)
 enum Capability {
   ModelCalls: "model_calls",
   ToolCalls: "tool_calls",
@@ -4089,7 +4011,6 @@ a consulted knob left unset takes the §7.2 default.
  * a consulted knob left unset takes the §7.2 default.
  */
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model CompositionConfig {
   @extension("default", "sequential/first_deny")
   profile?: CompositionProfile;
@@ -4144,7 +4065,6 @@ the specification already names and fail closed.
  * the specification already names and fail closed.
  */
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model Configuration {
   /** §8. */
   @extension("default", "enforce")
@@ -4216,7 +4136,6 @@ Type: [`FailureConfig`](#agenthooks-failureconfig).
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model FailureConfig {
   /**
    * §6.3.1. The document default every binding's on_error inherits. deny keeps
@@ -4246,7 +4165,6 @@ default: `"deny"`
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model FirstDenySupport {
   @uniqueItems
   @minItems(1)
@@ -4271,7 +4189,6 @@ OPTIONAL and informative; never checked against code.
 ```typespec
 /** OPTIONAL and informative; never checked against code. */
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model Host {
   /** Same grammar as agent.framework (§4.1). */
   @pattern("^[a-z0-9_-]{1,64}$")
@@ -4325,7 +4242,6 @@ registered names) live in the loader (§7.7.6).
  */
 @summary("Agent Hooks — host declaration document (agent-hooks/draft)")
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model HostDeclaration {
   configuration?: Configuration;
 
@@ -4437,7 +4353,6 @@ The failure posture (§6.3.1).
 
 ```typespec
 /** The failure posture (§6.3.1). */
-@category(Categories.Declaration)
 enum OnError {
   Deny: "deny",
   Continue: "continue",
@@ -4458,7 +4373,6 @@ Value: `"continue"`.
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model PostureConfig {
   /** §13.1. Must equal the posture the host's code implements. */
   @extension("default", "continue")
@@ -4491,7 +4405,6 @@ value only.
  * value only.
  */
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model ProfileSupport {
   `sequential/first_deny`?: FirstDenySupport;
   `sequential/run_all`?: RunAllSupport;
@@ -4524,7 +4437,6 @@ Type: [`UnanimousSupport`](#agenthooks-unanimoussupport).
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model RecordsConfig {
   /**
    * In-memory record buffer bound; null (the default) is unbounded. The maximum
@@ -4556,7 +4468,6 @@ Grammar of a registered name: provider, resolver, redactor or binding id.
 ```typespec
 /** Grammar of a registered name: provider, resolver, redactor or binding id. */
 @pattern("^[a-z][a-z0-9_-]{0,63}$")
-@category(Categories.Declaration)
 scalar Reference extends string;
 ```
 
@@ -4570,7 +4481,6 @@ Base type: `string`.
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model RunAllSupport {}
 ```
 
@@ -4584,7 +4494,6 @@ An object with no declared properties.
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model StrictestSupport {
   @uniqueItems
   @minItems(1)
@@ -4608,7 +4517,6 @@ The declared surface (§13.1) in file form, by output posture.
 
 ```typespec
 /** The declared surface (§13.1) in file form, by output posture. */
-@category(Categories.Declaration)
 union Surface {
   BufferedSurface,
   UnbufferedSurface,
@@ -4623,7 +4531,6 @@ union Surface {
 <a id="agenthooks-surfacebase"></a>
 
 ```typespec
-@category(Categories.Declaration)
 model SurfaceBase {
   /**
    * Points the host emits; always includes agent_startup, input, output and
@@ -4668,7 +4575,6 @@ A bound in milliseconds; null is unbounded.
 
 ```typespec
 /** A bound in milliseconds; null is unbounded. */
-@category(Categories.Declaration)
 union TimeoutMs {
   BoundedTimeoutMs,
   null,
@@ -4684,7 +4590,6 @@ union TimeoutMs {
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model TimeoutsConfig {
   /** §7 interceptor bound; default 5000. null means unbounded and must be written out. */
   interceptor_ms?: TimeoutMs;
@@ -4716,7 +4621,6 @@ The tool-seam posture a host implements (§13.1).
 
 ```typespec
 /** The tool-seam posture a host implements (§13.1). */
-@category(Categories.Declaration)
 enum ToolSeamHostError {
   Continue: "continue",
   Terminate: "terminate",
@@ -4737,7 +4641,6 @@ Value: `"terminate"`.
 
 ```typespec
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model UnanimousSupport {
   @uniqueItems
   @minItems(1)
@@ -4766,7 +4669,6 @@ written as false and exposure_bound is present.
  * written as false and exposure_bound is present.
  */
 @extension("additionalProperties", false)
-@category(Categories.Declaration)
 model UnbufferedSurface {
   ...SurfaceBase;
 

@@ -84,8 +84,9 @@ test("documents generic declarations, concrete envelopes, and inherited and nest
   const declarations = outputs["REFERENCE.md"];
   assert.match(
     declarations,
-    /```typespec\n\/\*\* Generic response wrapper\. \*\/\n\s*@category\(Categories.Responses\)\n\s*model Envelope<T>/,
+    /```typespec\n\/\*\* Generic response wrapper\. \*\/\n\s*model Envelope<T>/,
   );
+  assert.doesNotMatch(page, /@category\(Categories.Responses\)/);
   assert.match(declarations, /model Response extends Base/);
   assert.match(declarations, /#### `reason\?`\n\nA machine-readable reason\./);
   assert.match(declarations, /Type: `string` \| `null`\./);
@@ -109,9 +110,9 @@ test("ignores another namespace's category decorator on a generic declaration", 
     namespace Other {
       auto dec category(target: TypeSpec.Reflection.Model, value: AgentHooks.Docs.Categories);
     }
-    @Other.category(Categories.Responses)
-    @category(Categories.Requests)
-    model Listed<T> { value: T; }
+    @Other.category(Categories.Responses) @AgentHooks.Docs.category(
+      Categories.Requests
+    ) model Listed<T> { value: T; }
     @Other.category(Categories.Responses)
     model Unrelated<T> { value: T; }
   `);
@@ -120,6 +121,11 @@ test("ignores another namespace's category decorator on a generic declaration", 
     assert.doesNotMatch(page, /## Hook responses/);
     assert.match(page, /### `Listed<T>`/);
     assert.doesNotMatch(page, /### `Unrelated<T>`/);
+    assert.match(
+      page,
+      /@Other\.category\(Categories.Responses\) model Listed<T>/,
+    );
+    assert.doesNotMatch(page, /@AgentHooks\.Docs\.category/);
   }
 });
 
@@ -161,6 +167,8 @@ test("renders JSON examples, union variants, enums, and Markdown table metachara
   );
   assert.match(declarations, /union Selection \{ Choice, null \}/);
   assert.match(declarations, /scalar Identifier extends string;/);
+  assert.match(declarations, /@example\(/);
+  assert.doesNotMatch(declarations, /@category\(Categories\./);
   assert.match(declarations, /#### `First`\n\nValue: `"a\|b"`\./);
   assert.match(declarations, /Text with a \| separator and `left \| right`\./);
   assert.match(declarations, /pattern: `\^\(hello\|world\)\$`/);
