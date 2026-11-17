@@ -9,6 +9,7 @@ docs-site/docs/:
 
   spec/<version>.md   one page per released version, from AGENT-HOOKS-<version>.md
   spec/<version>-reference.md  generated reference, when the bundle has one
+  spec/<version>-reference-tables.md  table comparison, when present
   spec/draft.md       the draft, from AGENT-HOOKS-DRAFT.md, its banner link
                       pointed at the version page beside it
   spec.md             the newest released version again, the stable "latest" URL
@@ -198,7 +199,10 @@ def stage_schemas(root: Path, bundles: list[str], schema_out: Path) -> None:
 
 
 def staged_config(
-    config: str, versions: list[str], references: tuple[str, ...] = ()
+    config: str,
+    versions: list[str],
+    references: tuple[str, ...] = (),
+    table_references: tuple[str, ...] = (),
 ) -> str:
     """mkdocs.yml with the Specification entries regenerated: one per
     released version, newest first, then the draft."""
@@ -213,6 +217,10 @@ def staged_config(
     entries.append("      - Draft: spec/draft.md\n")
     for version in references:
         entries.append(f'      - "{version} reference": spec/{version}-reference.md\n')
+    for version in table_references:
+        entries.append(
+            f'      - "{version} reference (tables)": spec/{version}-reference-tables.md\n'
+        )
     return "".join(lines[: start + 1] + entries + lines[end:])
 
 
@@ -242,11 +250,19 @@ def stage(root: Path) -> list[str]:
     (pages / "draft.md").write_text(draft, encoding="utf-8")
 
     references = []
+    table_references = []
     for version in [*versions, "draft"]:
         reference = spec / version / "REFERENCE.md"
         if reference.is_file():
-            shutil.copyfile(reference, pages / f"{version}-reference.md")
+            text = reference.read_text(encoding="utf-8").replace(
+                "](REFERENCE-TABLES.md)", f"]({version}-reference-tables.md)"
+            )
+            (pages / f"{version}-reference.md").write_text(text, encoding="utf-8")
             references.append(version)
+        table_reference = spec / version / "REFERENCE-TABLES.md"
+        if table_reference.is_file():
+            shutil.copyfile(table_reference, pages / f"{version}-reference-tables.md")
+            table_references.append(version)
 
     schema_out = docs / "schema"
     shutil.rmtree(schema_out, ignore_errors=True)
@@ -256,7 +272,8 @@ def stage(root: Path) -> list[str]:
 
     config = (root / "docs-site" / "mkdocs.yml").read_text(encoding="utf-8")
     (root / "docs-site" / "mkdocs.staged.yml").write_text(
-        staged_config(config, versions, tuple(references)), encoding="utf-8"
+        staged_config(config, versions, tuple(references), tuple(table_references)),
+        encoding="utf-8",
     )
     return versions
 

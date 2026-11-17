@@ -101,7 +101,7 @@ differs from the generated text.
 cd spec/scripts && npm ci
 npm run generate:schema      # write spec/draft/schema/generated/**/*.schema.json
 npm run check:schema         # compile the source, then fail on any drift
-npm run generate:reference   # write spec/draft/REFERENCE.md
+npm run generate:reference   # write REFERENCE.md and REFERENCE-TABLES.md in spec/draft/
 npm run check:reference      # build the emitter, then reject reference drift
 npm run check:schema:equivalence -- --old origin/main   # differential validation against another revision
 ```

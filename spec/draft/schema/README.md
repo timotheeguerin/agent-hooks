@@ -99,7 +99,10 @@ draft copies only alongside corresponding SDK changes, as described in
 
 The local `@agent-hooks/reference-docs` emitter produces
 [`../REFERENCE.md`](../REFERENCE.md) from the same TypeSpec program, using
-`@alloy-js/markdown` components. `npm ci` builds the emitter; the reference
+`@alloy-js/markdown` components. Each declaration has a TypeSpec source
+excerpt followed by individual member documentation. The existing
+[table representation](../REFERENCE-TABLES.md) is also generated for comparison.
+`npm ci` builds the emitter; the reference
 generation and check commands rebuild it after source changes.
 It follows [TypeSpec's tspd](https://github.com/microsoft/typespec/tree/main/packages/tspd)
 approach of extracting compiler metadata and composing reference sections,
@@ -133,7 +136,7 @@ source comments; they are not treated as typed examples by this emitter.
 The handwritten specification links to the reference, and the Pages staging
 step publishes it beside the prose. The reference does not replace behavioral
 requirements or conformance checks. CI runs `npm run test:reference` and
-`npm run check:reference`; commit the generated page with its source changes.
+`npm run check:reference`; commit both generated pages with their source changes.
 
 ## Filesystem paths are not public schema identities
 

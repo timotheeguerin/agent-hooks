@@ -25,17 +25,22 @@ test("groups declarations by enum order and links same-named types by namespace"
       @category(Categories.Requests) model Result { id: string; }
     }
   `);
-  const page = outputs["REFERENCE.md"];
-  assert.ok(
-    page.indexOf("## Hook requests") < page.indexOf("## Hook responses"),
-  );
-  assert.match(
-    page,
-    /- \[Hook requests\]\(#hook-requests\)\n- \[Hook responses\]/,
-  );
-  assert.match(page, /\[\`Result\`\]\(#requests-result\)/);
-  assert.match(page, /<a id="hooks-result"><\/a>/);
-  assert.match(page, /<a id="requests-result"><\/a>/);
+  assert.deepEqual(Object.keys(outputs).sort(), [
+    "REFERENCE-TABLES.md",
+    "REFERENCE.md",
+  ]);
+  for (const page of Object.values(outputs)) {
+    assert.ok(
+      page.indexOf("## Hook requests") < page.indexOf("## Hook responses"),
+    );
+    assert.match(
+      page,
+      /- \[Hook requests\]\(#hook-requests\)\n- \[Hook responses\]/,
+    );
+    assert.match(page, /\[\`Result\`\]\(#requests-result\)/);
+    assert.match(page, /<a id="hooks-result"><\/a>/);
+    assert.match(page, /<a id="requests-result"><\/a>/);
+  }
 });
 
 test("documents generic declarations, concrete envelopes, and inherited and nested constraints", async () => {
@@ -61,7 +66,7 @@ test("documents generic declarations, concrete envelopes, and inherited and nest
       next?: Response;
     }
   `);
-  const page = outputs["REFERENCE.md"];
+  const page = outputs["REFERENCE-TABLES.md"];
   assert.match(page, /### `Envelope<T>`/);
   assert.match(page, /Generic response wrapper\./);
   assert.match(page, /\| `value` \| `T` \|/);
@@ -76,6 +81,17 @@ test("documents generic declarations, concrete envelopes, and inherited and nest
   assert.match(page, /pattern: `\^\(\?!host_error:\)\.\*`/);
   assert.match(page, /\| `agent.id` \| `string` \|  \| minLength: `1` \|/);
   assert.match(page, /\| `next\?` \| \[\`Response\`\]\(#test-response\)/);
+  const declarations = outputs["REFERENCE.md"];
+  assert.match(
+    declarations,
+    /```typespec\n\/\*\* Generic response wrapper\. \*\/\n\s*@category\(Categories.Responses\)\n\s*model Envelope<T>/,
+  );
+  assert.match(declarations, /model Response extends Base/);
+  assert.match(declarations, /#### `reason\?`\n\nA machine-readable reason\./);
+  assert.match(declarations, /Type: `string` \| `null`\./);
+  assert.match(declarations, /#### `agent.id`[\s\S]*?minLength: `1`/);
+  assert.match(declarations, /Type: \[\`Response\`\]\(#test-response\)\./);
+  assert.doesNotMatch(declarations, /^\| Property \|/m);
 });
 
 test("ignores another namespace's category decorator on a generic declaration", async () => {
@@ -99,10 +115,12 @@ test("ignores another namespace's category decorator on a generic declaration", 
     @Other.category(Categories.Responses)
     model Unrelated<T> { value: T; }
   `);
-  assert.match(outputs["REFERENCE.md"], /## Hook requests/);
-  assert.doesNotMatch(outputs["REFERENCE.md"], /## Hook responses/);
-  assert.match(outputs["REFERENCE.md"], /### `Listed<T>`/);
-  assert.doesNotMatch(outputs["REFERENCE.md"], /### `Unrelated<T>`/);
+  for (const page of Object.values(outputs)) {
+    assert.match(page, /## Hook requests/);
+    assert.doesNotMatch(page, /## Hook responses/);
+    assert.match(page, /### `Listed<T>`/);
+    assert.doesNotMatch(page, /### `Unrelated<T>`/);
+  }
 });
 
 test("renders JSON examples, union variants, enums, and Markdown table metacharacters", async () => {
@@ -111,6 +129,8 @@ test("renders JSON examples, union variants, enums, and Markdown table metachara
     enum Choice { First: "a|b", Second: "second" }
     @category(Categories.Common)
     union Selection { Choice, null }
+    @category(Categories.Common)
+    scalar Identifier extends string;
     @example(#{ text: "hello" }, #{ title: "Minimal" })
     @category(Categories.Requests)
     model Request {
@@ -121,7 +141,7 @@ test("renders JSON examples, union variants, enums, and Markdown table metachara
       choices?: (Choice | null)[];
     }
   `);
-  const page = outputs["REFERENCE.md"];
+  const page = outputs["REFERENCE-TABLES.md"];
   assert.match(page, /<code>"a&#124;b"<\/code>/);
   assert.match(
     page,
@@ -134,6 +154,21 @@ test("renders JSON examples, union variants, enums, and Markdown table metachara
     /\| `choices\?` \| \(\[\`Choice\`\]\(#choice\) &#124; `null`\)\[\] \|/,
   );
   assert.match(page, /#### Minimal\n\n```json\n{\n  "text": "hello"\n}\n```/);
+  const declarations = outputs["REFERENCE.md"];
+  assert.match(
+    declarations,
+    /enum Choice \{ First: "a\|b", Second: "second" \}/,
+  );
+  assert.match(declarations, /union Selection \{ Choice, null \}/);
+  assert.match(declarations, /scalar Identifier extends string;/);
+  assert.match(declarations, /#### `First`\n\nValue: `"a\|b"`\./);
+  assert.match(declarations, /Text with a \| separator and `left \| right`\./);
+  assert.match(declarations, /pattern: `\^\(hello\|world\)\$`/);
+  assert.match(
+    declarations,
+    /#### Minimal\n\n```json\n{\n  "text": "hello"\n}\n```/,
+  );
+  assert.doesNotMatch(declarations, /^\| (?:Property|Member) \|/m);
 });
 
 test("reports an empty selection rather than emitting a success-shaped empty page", async () => {
