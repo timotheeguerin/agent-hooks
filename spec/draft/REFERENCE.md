@@ -31,7 +31,6 @@ Each declaration is shown as a TypeSpec source excerpt, followed by its member d
 Composition profiles (§7.1), in §7.2 table order.
 
 ```typespec
-/** Composition profiles (§7.1), in §7.2 table order. */
 enum CompositionProfile {
   SequentialFirstDeny: "sequential/first_deny",
   SequentialRunAll: "sequential/run_all",
@@ -63,7 +62,6 @@ Value: `"parallel/unanimous"`.
 Values of the on_disagreement and on_transform_conflict knobs (§7.2).
 
 ```typespec
-/** Values of the on_disagreement and on_transform_conflict knobs (§7.2). */
 enum ConflictResolution {
   Deny: "deny",
   Approval: "approval",
@@ -86,10 +84,6 @@ Namespaced extensions (§4.6): any value under a key that follows the
 namespace rule.
 
 ```typespec
-/**
- * Namespaced extensions (§4.6): any value under a key that follows the
- * namespace rule.
- */
 @extension("propertyNames", #{ pattern: "^[a-z][a-z0-9_]*$" })
 model Extensions is Record<unknown>;
 ```
@@ -102,11 +96,11 @@ Additional entries: `unknown`.
 
 <a id="agenthooks-interceptionpoint"></a>
 
+Agent Hooks — interception point
+
 The closed set of agent lifecycle interception points (AGENT-HOOKS-0.1 §3).
 
 ```typespec
-/** The closed set of agent lifecycle interception points (AGENT-HOOKS-0.1 §3). */
-@summary("Agent Hooks — interception point")
 enum InterceptionPoint {
   AgentStartup: "agent_startup",
   Input: "input",
@@ -158,7 +152,6 @@ Value: `"agent_shutdown"`.
 An open JSON object, not an arbitrary JSON value.
 
 ```typespec
-/** An open JSON object, not an arbitrary JSON value. */
 model JsonObject {}
 ```
 
@@ -171,7 +164,6 @@ An object with no declared properties.
 Enforcement modes (§8).
 
 ```typespec
-/** Enforcement modes (§8). */
 enum Mode {
   Enforce: "enforce",
   EvaluateOnly: "evaluate_only",
@@ -193,7 +185,6 @@ Value: `"evaluate_only"`.
 Values of the on_approval knob (§7.2).
 
 ```typespec
-/** Values of the on_approval knob (§7.2). */
 enum OnApproval {
   Stop: "stop",
   Resume: "resume",
@@ -244,7 +235,6 @@ Value: `"resume"`.
 Who acts (§4.5).
 
 ```typespec
-/** Who acts (§4.5). */
 enum ActorKind {
   Human: "human",
   Service: "service",
@@ -268,17 +258,13 @@ Value: `"agent"`.
 
 <a id="agenthooks-agentcontext"></a>
 
+Agent Hooks — agent context
+
 Payload a host constructs at each interception point (AGENT-HOOKS-0.1 §4).
 Each variant requires its discriminator and own hook payload, with shared
 metadata and optional namespaced extensions.
 
 ```typespec
-/**
- * Payload a host constructs at each interception point (AGENT-HOOKS-0.1 §4).
- * Each variant requires its discriminator and own hook payload, with shared
- * metadata and optional namespaced extensions.
- */
-@summary("Agent Hooks — agent context")
 union AgentContext {
   AgentStartupRequest,
   InputRequest,
@@ -307,7 +293,6 @@ union AgentContext {
 Conditional payload of agent_startup (§4.2).
 
 ```typespec
-/** Conditional payload of agent_startup (§4.2). */
 model AgentInit {
   tools_registered: string[];
 }
@@ -324,7 +309,6 @@ Type: `string`[].
 The request at agent_shutdown: summary is required (§4.2).
 
 ```typespec
-/** The request at agent_shutdown: summary is required (§4.2). */
 model AgentShutdownRequest {
   ...HooksRequest<InterceptionPoint.AgentShutdown>;
   summary: Summary;
@@ -471,7 +455,6 @@ Type: [`Summary`](#agenthooks-summary).
 The request at agent_startup: agent_init is required (§4.2).
 
 ```typespec
-/** The request at agent_startup: agent_init is required (§4.2). */
 model AgentStartupRequest {
   ...HooksRequest<InterceptionPoint.AgentStartup>;
   agent_init: AgentInit;
@@ -618,12 +601,7 @@ Type: [`AgentInit`](#agenthooks-agentinit).
 Metadata available at every interception point.
 
 ```typespec
-/** Metadata available at every interception point. */
 model ContextMetadata {
-  /**
-   * This version's wire string (§4.1). A released version's contexts
-   * carry that version's own string, agent-hooks/<major>.<minor>.
-   */
   spec: "agent-hooks/draft";
 
   @format("date-time")
@@ -942,7 +920,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Conditional payload of input (§4.2).
 
 ```typespec
-/** Conditional payload of input (§4.2). */
 model Input {
   content: unknown;
   role: InputRole;
@@ -964,7 +941,6 @@ Type: [`InputRole`](#agenthooks-inputrole).
 The request at input: input is required (§4.2).
 
 ```typespec
-/** The request at input: input is required (§4.2). */
 model InputRequest {
   ...HooksRequest<InterceptionPoint.Input>;
   input: Input;
@@ -1111,7 +1087,6 @@ Type: [`Input`](#agenthooks-input).
 Who produced an input (§4.2).
 
 ```typespec
-/** Who produced an input (§4.2). */
 enum InputRole {
   User: "user",
   System: "system",
@@ -1138,7 +1113,6 @@ Value: `"external"`.
 One message of the model request (§4.2).
 
 ```typespec
-/** One message of the model request (§4.2). */
 model Message {
   role: string;
   content: unknown;
@@ -1160,7 +1134,6 @@ Type: `unknown`.
 Conditional payload of pre_model_call and post_model_call (§4.2).
 
 ```typespec
-/** Conditional payload of pre_model_call and post_model_call (§4.2). */
 model Model {
   id: string;
   vendor?: string;
@@ -1187,7 +1160,6 @@ Type: [`JsonObject`](#agenthooks-jsonobject).
 Conditional payload of output (§4.2).
 
 ```typespec
-/** Conditional payload of output (§4.2). */
 model Output {
   content: unknown;
 }
@@ -1204,7 +1176,6 @@ Type: `unknown`.
 The request at output: output is required (§4.2).
 
 ```typespec
-/** The request at output: output is required (§4.2). */
 model OutputRequest {
   ...HooksRequest<InterceptionPoint.Output>;
   output: Output;
@@ -1351,7 +1322,6 @@ Type: [`Output`](#agenthooks-output).
 The request at post_model_call: model and response are required (§4.2).
 
 ```typespec
-/** The request at post_model_call: model and response are required (§4.2). */
 model PostModelCallRequest {
   ...HooksRequest<InterceptionPoint.PostModelCall>;
   `model`: Model;
@@ -1513,7 +1483,6 @@ Type: [`Usage`](#agenthooks-usage).
 The request at post_tool_call: tool_call and tool_result are required (§4.2).
 
 ```typespec
-/** The request at post_tool_call: tool_call and tool_result are required (§4.2). */
 model PostToolCallRequest {
   ...HooksRequest<InterceptionPoint.PostToolCall>;
   tool_call: ToolCall;
@@ -1665,7 +1634,6 @@ Type: [`ToolResult`](#agenthooks-toolresult).
 The request at pre_model_call: model and messages are required (§4.2).
 
 ```typespec
-/** The request at pre_model_call: model and messages are required (§4.2). */
 model PreModelCallRequest {
   ...HooksRequest<InterceptionPoint.PreModelCall>;
   `model`: Model;
@@ -1827,7 +1795,6 @@ Type: `string`.
 The request at pre_tool_call: tool_call is required (§4.2).
 
 ```typespec
-/** The request at pre_tool_call: tool_call is required (§4.2). */
 model PreToolCallRequest {
   ...HooksRequest<InterceptionPoint.PreToolCall>;
   tool_call: ToolCall;
@@ -1974,7 +1941,6 @@ Type: [`ToolCall`](#agenthooks-toolcall).
 Conditional payload of post_model_call (§4.2).
 
 ```typespec
-/** Conditional payload of post_model_call (§4.2). */
 model Response {
   content: unknown;
   tool_calls: ToolCallRequest[];
@@ -2001,7 +1967,6 @@ Type: `string`.
 Conditional payload of agent_shutdown (§4.2).
 
 ```typespec
-/** Conditional payload of agent_shutdown (§4.2). */
 model Summary {
   reason: SummaryReason;
 
@@ -2045,7 +2010,6 @@ minimum: `0`
 Why the agent stopped (§4.2).
 
 ```typespec
-/** Why the agent stopped (§4.2). */
 enum SummaryReason {
   Completed: "completed",
   Error: "error",
@@ -2072,7 +2036,6 @@ Value: `"cancelled"`.
 Conditional payload of pre_tool_call and post_tool_call (§4.2).
 
 ```typespec
-/** Conditional payload of pre_tool_call and post_tool_call (§4.2). */
 model ToolCall {
   @minLength(1)
   id: string;
@@ -2116,7 +2079,6 @@ pattern: `^sha256:[0-9a-f]{64}$`
 One tool call the model asked for (§4.2).
 
 ```typespec
-/** One tool call the model asked for (§4.2). */
 model ToolCallRequest {
   id?: string;
   name: string;
@@ -2143,7 +2105,6 @@ Type: [`JsonObject`](#agenthooks-jsonobject).
 One declared tool (§4.3).
 
 ```typespec
-/** One declared tool (§4.3). */
 model ToolDecl {
   name: string;
   description?: string;
@@ -2170,7 +2131,6 @@ Type: [`JsonObject`](#agenthooks-jsonobject).
 Conditional payload of post_tool_call (§4.2).
 
 ```typespec
-/** Conditional payload of post_tool_call (§4.2). */
 model ToolResult {
   value: unknown;
   is_error: boolean;
@@ -2201,7 +2161,6 @@ minimum: `0`
 Token usage of a model call (§4.3).
 
 ```typespec
-/** Token usage of a model call (§4.3). */
 model Usage {
   @minValue(0)
   prompt_tokens?: integer;
@@ -2248,7 +2207,6 @@ minimum: `0`
 agent_shutdown response: transforms are forbidden.
 
 ```typespec
-/** agent_shutdown response: transforms are forbidden. */
 model AgentShutdownHookResponse is HookResponse<NonTransformVerdict>;
 ```
 
@@ -2269,7 +2227,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 agent_startup response: transforms are forbidden.
 
 ```typespec
-/** agent_startup response: transforms are forbidden. */
 model AgentStartupHookResponse is HookResponse<NonTransformVerdict>;
 ```
 
@@ -2290,7 +2247,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Hook response envelope with a hook-specific verdict.
 
 ```typespec
-/** Hook response envelope with a hook-specific verdict. */
 @extension("additionalProperties", false)
 model HookResponse<TVerdict> {
   verdict: TVerdict;
@@ -2313,7 +2269,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 input response.
 
 ```typespec
-/** input response. */
 model InputHookResponse is HookResponse<Verdict<InputHookTransform>>;
 ```
 
@@ -2334,7 +2289,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Replaces the complete input payload.
 
 ```typespec
-/** Replaces the complete input payload. */
 @extension("additionalProperties", false)
 model InputHookTransform {
   input: InputRequest.input;
@@ -2354,7 +2308,6 @@ Type: `InputRequest.input`.
 output response.
 
 ```typespec
-/** output response. */
 model OutputHookResponse is HookResponse<Verdict<OutputHookTransform>>;
 ```
 
@@ -2375,7 +2328,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Replaces the complete output payload.
 
 ```typespec
-/** Replaces the complete output payload. */
 @extension("additionalProperties", false)
 model OutputHookTransform {
   output: OutputRequest.output;
@@ -2395,7 +2347,6 @@ Type: `OutputRequest.output`.
 post_model_call response.
 
 ```typespec
-/** post_model_call response. */
 model PostModelHookResponse is HookResponse<Verdict<PostModelHookTransform>>;
 ```
 
@@ -2416,7 +2367,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Replaces the complete model response payload.
 
 ```typespec
-/** Replaces the complete model response payload. */
 @extension("additionalProperties", false)
 model PostModelHookTransform {
   response: PostModelCallRequest.response;
@@ -2436,7 +2386,6 @@ Type: `PostModelCallRequest.response`.
 post_tool_call response.
 
 ```typespec
-/** post_tool_call response. */
 model PostToolHookResponse is HookResponse<Verdict<PostToolHookTransform>>;
 ```
 
@@ -2457,7 +2406,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Replaces only the value of the tool result.
 
 ```typespec
-/** Replaces only the value of the tool result. */
 @extension("additionalProperties", false)
 model PostToolHookTransform {
   value: ToolResult.value;
@@ -2477,7 +2425,6 @@ Type: `ToolResult.value`.
 pre_model_call response.
 
 ```typespec
-/** pre_model_call response. */
 model PreModelHookResponse is HookResponse<Verdict<PreModelHookTransform>>;
 ```
 
@@ -2498,7 +2445,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Replaces the complete model-message array.
 
 ```typespec
-/** Replaces the complete model-message array. */
 @extension("additionalProperties", false)
 model PreModelHookTransform {
   messages: PreModelCallRequest.messages;
@@ -2518,7 +2464,6 @@ Type: `PreModelCallRequest.messages`.
 pre_tool_call response.
 
 ```typespec
-/** pre_tool_call response. */
 model PreToolHookResponse is HookResponse<Verdict<PreToolHookTransform>>;
 ```
 
@@ -2539,7 +2484,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 Replaces the complete tool args for the pre-tool hook.
 
 ```typespec
-/** Replaces the complete tool args for the pre-tool hook. */
 @extension("additionalProperties", false)
 model PreToolHookTransform {
   args: ToolCall.args;
@@ -2571,7 +2515,6 @@ Type: `ToolCall.args`.
 allow: proceed. Absorbs warn through warnings[] (§5.1).
 
 ```typespec
-/** allow: proceed. Absorbs warn through warnings[] (§5.1). */
 @extension("additionalProperties", false)
 model AllowVerdict {
   ...VerdictBase;
@@ -2626,7 +2569,6 @@ Type: [`Decision.Allow`](#agenthooks-decision).
 The three decisions (§5).
 
 ```typespec
-/** The three decisions (§5). */
 enum Decision {
   Allow: "allow",
   Deny: "deny",
@@ -2653,16 +2595,11 @@ Value: `"transform"`.
 deny: stop the action. Absorbs escalate through the approval block (§5.1).
 
 ```typespec
-/** deny: stop the action. Absorbs escalate through the approval block (§5.1). */
 @extension("additionalProperties", false)
 model DenyVerdict {
   ...VerdictBase;
   decision: Decision.Deny;
 
-  /**
-   * Present only on deny: marks the deny as liftable by the approval seam (§9).
-   * MAY be empty; reserved for approver-facing parameters.
-   */
   approval?: JsonObject;
 }
 ```
@@ -2721,10 +2658,8 @@ Type: [`JsonObject`](#agenthooks-jsonobject).
 Offline-verifiable evidence attached to a verdict (§14).
 
 ```typespec
-/** Offline-verifiable evidence attached to a verdict (§14). */
 @extension("additionalProperties", false)
 model Evidence {
-  /** Content address (sha256:<hex>) or URI of an offline-verifiable proof. */
   artefact?: string | null;
 
   verification_pointers?: VerificationPointers;
@@ -2750,7 +2685,6 @@ Type: [`VerificationPointers`](#agenthooks-verificationpointers).
 Verdict choices for hooks that do not support transforms.
 
 ```typespec
-/** Verdict choices for hooks that do not support transforms. */
 union NonTransformVerdict {
   AllowVerdict,
   DenyVerdict,
@@ -2767,7 +2701,6 @@ union NonTransformVerdict {
 transform: proceed with the hook-specific replacement payload.
 
 ```typespec
-/** transform: proceed with the hook-specific replacement payload. */
 @extension("additionalProperties", false)
 model TransformVerdict<TTransform> {
   ...VerdictBase;
@@ -2825,31 +2758,16 @@ Type: `TTransform`.
 Members every decision may carry.
 
 ```typespec
-/** Members every decision may carry. */
 model VerdictBase {
-  /**
-   * Interceptor-supplied machine identifier. The host_error: prefix is reserved
-   * for host-synthesized failures (§11).
-   */
   @pattern("^(?!host_error:).*")
   reason?: string | null;
 
-  /** Human-readable text for the caller. */
   message?: string | null;
 
-  /**
-   * Recorded concerns that do not affect control flow (§5.1). Permitted on any
-   * decision; unioned across an emission's verdicts (§7.3). Reasons starting with
-   * host_warning: are reserved for the host (§11.1).
-   */
   warnings?: Warning[] | null;
 
   evidence?: Evidence;
 
-  /**
-   * Interceptor-supplied labels the host MUST persist with the produced data and
-   * resurface on later interception points (§5.4).
-   */
   result_labels?: string[] | null;
 }
 ```
@@ -2895,7 +2813,6 @@ Type: `string`[] | `null`.
 Named URIs an auditor MAY consult. Hosts MUST NOT dereference automatically (§14).
 
 ```typespec
-/** Named URIs an auditor MAY consult. Hosts MUST NOT dereference automatically (§14). */
 model VerificationPointers is Record<string>;
 ```
 
@@ -2908,15 +2825,8 @@ Additional entries: `string`.
 A recorded concern that does not affect control flow (§5.1).
 
 ```typespec
-/** A recorded concern that does not affect control flow (§5.1). */
 @extension("additionalProperties", false)
 model Warning {
-  /**
-   * Interceptor-supplied warning identifier. The host_error: prefix is reserved
-   * for host-synthesized failures (§11) and host_warning: for host-synthesized
-   * warnings (§11.1); an interceptor warning with either prefix fails §5
-   * validation.
-   */
   @pattern("^(?!host_error:|host_warning:).*")
   reason?: string | null;
 
@@ -2959,7 +2869,6 @@ Type: `string` | `null`.
 approve: the resolver lifts the deny with an allow verdict.
 
 ```typespec
-/** approve: the resolver lifts the deny with an allow verdict. */
 @extension("additionalProperties", false)
 model ApproveResolution {
   ...ResolutionBase;
@@ -2996,13 +2905,6 @@ member is validated against the §5 schema only when its reason is not
 host_error:*.
 
 ```typespec
-/**
- * The liftable deny being consulted: an interceptor's (passes §5,
- * verdict.schema.json) or the host-synthesized §7.5 shape, whose reason is a
- * reserved host_error:* string that §5 forbids interceptors to emit — so this
- * member is validated against the §5 schema only when its reason is not
- * host_error:*.
- */
 model LiftableDeny {
   decision: Decision.Deny;
   ...Record<unknown>;
@@ -3022,7 +2924,6 @@ Type: [`Decision.Deny`](#agenthooks-decision).
 How a consultation ended (§9).
 
 ```typespec
-/** How a consultation ended (§9). */
 enum Outcome {
   Approve: "approve",
   Reject: "reject",
@@ -3049,7 +2950,6 @@ Value: `"unresolved"`.
 reject: the resolver keeps a deny.
 
 ```typespec
-/** reject: the resolver keeps a deny. */
 @extension("additionalProperties", false)
 model RejectResolution {
   ...ResolutionBase;
@@ -3082,14 +2982,12 @@ Type: [`DenyVerdict`](#agenthooks-denyverdict).
 What the host hands the resolver (§9).
 
 ```typespec
-/** What the host hands the resolver (§9). */
 @extension("additionalProperties", false)
 model request {
   context_identity: string | null;
   interception_point: InterceptionPoint;
   verdict: LiftableDeny;
 
-  /** The AgentContext as presented to the resolver. MAY be redacted per host policy. */
   context?: AgentContext;
 }
 ```
@@ -3121,7 +3019,6 @@ Type: [`AgentContext`](#agenthooks-agentcontext).
 What the resolver returns (§9).
 
 ```typespec
-/** What the resolver returns (§9). */
 union resolution {
   ApproveResolution,
   RejectResolution,
@@ -3139,10 +3036,6 @@ union resolution {
 
 ```typespec
 model ResolutionBase {
-  /**
-   * MUST equal the request's context_identity byte for byte (echo rule, §9);
-   * null echoes as null.
-   */
   context_identity: string | null;
 }
 ```
@@ -3161,7 +3054,6 @@ Type: `string` | `null`.
 unresolved: no decision; the deny stands and no verdict is carried.
 
 ```typespec
-/** unresolved: no decision; the deny stands and no verdict is carried. */
 @extension("additionalProperties", false)
 model UnresolvedResolution {
   ...ResolutionBase;
@@ -3200,7 +3092,6 @@ Type: [`Outcome.Unresolved`](#agenthooks-outcome).
 Presence only; members are stripped by the projection.
 
 ```typespec
-/** Presence only; members are stripped by the projection. */
 @extension("additionalProperties", false)
 model ApprovalPresence {}
 ```
@@ -3212,6 +3103,8 @@ An object with no declared properties.
 ### `InterceptionRecord`
 
 <a id="agenthooks-interceptionrecord"></a>
+
+Agent Hooks — interception record
 
 Host-side record of one emission (AGENT-HOOKS-0.1 §10.3). Payload-free:
 identities (when a provider is declared) bind the record to the exact
@@ -3225,19 +3118,6 @@ is REQUIRED under the multi-verdict profiles (§7.4), and the identities are
 null when identity_provider is null (§10.3).
 
 ```typespec
-/**
- * Host-side record of one emission (AGENT-HOOKS-0.1 §10.3). Payload-free:
- * identities (when a provider is declared) bind the record to the exact
- * pre/post-composition context; session_id/sequence/decided_by provide ordering
- * and attribution; composition makes the record interpretable without
- * out-of-band host configuration.
- *
- * Two rules relate members and cannot be typed, so they are written as JSON
- * Schema in the allOf extension below and copied through by the emitter: verdicts
- * is REQUIRED under the multi-verdict profiles (§7.4), and the identities are
- * null when identity_provider is null (§10.3).
- */
-@summary("Agent Hooks — interception record")
 @extension("additionalProperties", false)
 @extension(
   "allOf",
@@ -3278,47 +3158,24 @@ model InterceptionRecord {
   mode: Mode;
   verdict: VerdictProjection;
 
-  /** Identity provider output on the context before dispatch; null iff identity_provider is null. */
   input_identity: string | null;
 
-  /** Identity provider output after composition completes; null iff identity_provider is null. */
   enforced_identity: string | null;
 
-  /**
-   * The declared identity provider (§10.1): "jcs-sha256", a host-defined id
-   * (name rules enforced: ^[a-z][a-z0-9_-]*$ and never a jcs prefix), or null
-   * (identity-unbound).
-   */
   @pattern("^(jcs-sha256|(?!jcs)[a-z][a-z0-9_-]*)$")
   identity_provider: string | null;
 
-  /** ctx.session.id — correlates records across a session. */
   session_id: string;
 
-  /** ctx.sequence — total order of records within the session (§12.2.3). */
   sequence: integer;
 
-  /**
-   * OPTIONAL. The context's RFC 3339 timestamp, copied verbatim (§10.3); absent
-   * when the context lacked the field.
-   */
   timestamp?: string;
 
-  /**
-   * OPTIONAL. W3C Trace Context identifiers echoed from the context's optional
-   * trace block (§4.5, §10.3); absent when the context carried neither member.
-   */
   trace?: Trace;
 
-  /**
-   * Registration index of the interceptor whose verdict won aggregation or whose
-   * liftable deny was consulted (§7.6); null for a pure-allow combination or a
-   * host-synthesized verdict.
-   */
   @minValue(0)
   decided_by?: integer | null;
 
-  /** The composition profile and knobs in effect for this emission (§7.1). */
   @extension("additionalProperties", false)
   composition: {
     profile: CompositionProfile;
@@ -3327,28 +3184,12 @@ model InterceptionRecord {
     on_transform_conflict?: ConflictResolution;
   };
 
-  /**
-   * Payload-free per-interceptor summary. REQUIRED in multi-verdict profiles
-   * (sequential/run_all, parallel/*) and whenever any slot carries
-   * substituted_for (§6.3.1); otherwise OPTIONAL in sequential/first_deny.
-   */
   verdicts?: VerdictSlot[];
 
-  /**
-   * true iff one or more registered interceptors were never invoked in this
-   * emission (short-circuit, approval-stop, or a failed fold-transform). Defined
-   * for the sequential profiles (§7.4).
-   */
   fold_truncated?: boolean;
 
-  /**
-   * Consultation outcome (§7.6, §10.3): "approval" iff a permit resolution
-   * substituted for a verdict; "rejection" iff the seam was consulted and did not
-   * lift the deny; absent/null iff never consulted.
-   */
   resolved_by?: ResolvedBy | null;
 
-  /** Number of interceptors registered at emission time (§10.3). */
   @minValue(0)
   interceptors_registered: integer;
 }
@@ -3489,7 +3330,6 @@ minimum: `0`
 Consultation outcomes a record names (§7.6).
 
 ```typespec
-/** Consultation outcomes a record names (§7.6). */
 enum ResolvedBy {
   Approval: "approval",
   Rejection: "rejection",
@@ -3511,7 +3351,6 @@ Value: `"rejection"`.
 The host_error reasons a continue posture may substitute for (§6.3.1).
 
 ```typespec
-/** The host_error reasons a continue posture may substitute for (§6.3.1). */
 enum SubstitutedFor {
   InterceptorFailed: "host_error:interceptor_failed",
   InterceptorTimeout: "host_error:interceptor_timeout",
@@ -3539,10 +3378,6 @@ W3C Trace Context identifiers echoed from the context's optional trace block
 (§4.5, §10.3).
 
 ```typespec
-/**
- * W3C Trace Context identifiers echoed from the context's optional trace block
- * (§4.5, §10.3).
- */
 @extension("additionalProperties", false)
 model Trace {
   trace_id?: string;
@@ -3570,12 +3405,6 @@ details are omitted, approval members stripped, messages truncated to
 warnings[].reason may carry host_warning:control_failed (§6.3.1, §11.1).
 
 ```typespec
-/**
- * A payload-free projection of the combined verdict (§10.3): transform
- * details are omitted, approval members stripped, messages truncated to
- * 256 UTF-8 bytes.
- * warnings[].reason may carry host_warning:control_failed (§6.3.1, §11.1).
- */
 @extension("additionalProperties", false)
 model VerdictProjection {
   decision: Decision;
@@ -3625,7 +3454,6 @@ Type: [`ApprovalPresence`](#agenthooks-approvalpresence).
 Payload-free summary of one interceptor's verdict (§10.3).
 
 ```typespec
-/** Payload-free summary of one interceptor's verdict (§10.3). */
 @extension("additionalProperties", false)
 model VerdictSlot {
   @minValue(0)
@@ -3634,14 +3462,8 @@ model VerdictSlot {
   decision: Decision;
   reason?: string | null;
 
-  /** Host-chosen payload-free registration identifier for the interceptor at index (§10.3). */
   name?: string;
 
-  /**
-   * Present iff this slot's verdict is the allow the host substituted under
-   * on_error: continue (§6.3.1): the host_error reason the §6.3 deny would have
-   * carried. The entry's decision is allow and reason is absent.
-   */
   substituted_for?: SubstitutedFor;
 }
 ```
@@ -3683,7 +3505,6 @@ Type: [`SubstitutedFor`](#agenthooks-substitutedfor).
 Warning metadata retained in a payload-free record projection.
 
 ```typespec
-/** Warning metadata retained in a payload-free record projection. */
 @extension("additionalProperties", false)
 model WarningProjection {
   reason?: string | null;
@@ -3736,14 +3557,9 @@ Type: `string` | `null`.
 ```typespec
 @extension("additionalProperties", false)
 model ApprovalConfig {
-  /**
-   * §9. A registered approval resolver by reference, or null: liftable denies
-   * stay denies.
-   */
   @pattern("^[a-z][a-z0-9_-]{0,63}$")
   resolver?: string | null;
 
-  /** §9 redaction seam. A registered approval redactor by reference, or null. */
   @pattern("^[a-z][a-z0-9_-]{0,63}$")
   redactor?: string | null;
 }
@@ -3775,46 +3591,22 @@ pattern: `^[a-z][a-z0-9_-]{0,63}$`
 One interceptor binding (§7.7.4).
 
 ```typespec
-/** One interceptor binding (§7.7.4). */
 @extension("additionalProperties", false)
 model Binding {
-  /** Unique in the array; stamped on verdicts[].name (§10.3). */
   id: Reference;
 
-  /**
-   * A lookup key into the host's kind registry and nothing more: never a path,
-   * class name, URL or module the loader interprets. At least one dot, so every
-   * kind carries a namespace the host controls. The first segments agent_hooks
-   * and ctk are reserved. This specification defines no kinds.
-   */
   @pattern("^[a-z][a-z0-9_-]*(\\.[a-z][a-z0-9_-]*)+$")
   @maxLength(128)
   kind: string;
 
-  /**
-   * Kind-specific; handed to the kind resolver unchanged. The loader interprets
-   * none of it; its one check here is the document-wide integer bound of §7.7.6
-   * (no integer token above 2^53 - 1, so the resolved form canonicalises).
-   * Default {}.
-   */
   config?: unknown;
 
-  /**
-   * Points this binding runs at, each in the surface. Default: every surface
-   * point.
-   */
   @uniqueItems
   @minItems(1)
   at?: InterceptionPoint[];
 
-  /** Per-binding bound. Default: configuration.timeouts.interceptor_ms; null is unbounded. */
   timeout_ms?: TimeoutMs;
 
-  /**
-   * §6.3.1 failure posture for this binding: what the host does when the
-   * interceptor raises, times out or returns an invalid verdict. Default:
-   * configuration.failure.on_error.
-   */
   on_error?: OnError;
 }
 ```
@@ -3892,15 +3684,10 @@ The surface of a host that buffers output (§12.1a), the default:
 exposure_bound is absent.
 
 ```typespec
-/**
- * The surface of a host that buffers output (§12.1a), the default:
- * exposure_bound is absent.
- */
 @extension("additionalProperties", false)
 model BufferedSurface {
   ...SurfaceBase;
 
-  /** §12.1a. false must be declared explicitly and requires exposure_bound. */
   @extension("default", true)
   buffered_output?: true;
 }
@@ -3944,11 +3731,6 @@ less buffered_output, which is the boolean surface member, plus
 host_declaration.
 
 ```typespec
-/**
- * The conformance capability vocabulary (§13.1, conformance/draft/vectors.schema.json)
- * less buffered_output, which is the boolean surface member, plus
- * host_declaration.
- */
 enum Capability {
   ModelCalls: "model_calls",
   ToolCalls: "tool_calls",
@@ -4006,22 +3788,15 @@ Value: `"host_declaration"`.
 a consulted knob left unset takes the §7.2 default.
 
 ```typespec
-/**
- * §7.2. A knob the declared profile does not consult is refused, never cleared;
- * a consulted knob left unset takes the §7.2 default.
- */
 @extension("additionalProperties", false)
 model CompositionConfig {
   @extension("default", "sequential/first_deny")
   profile?: CompositionProfile;
 
-  /** Consulted by sequential/first_deny only; refused under any other profile (§7.7.3). */
   on_approval?: OnApproval;
 
-  /** Consulted by parallel/unanimous only. */
   on_disagreement?: ConflictResolution;
 
-  /** Consulted by parallel/strictest only. */
   on_transform_conflict?: ConflictResolution;
 }
 ```
@@ -4060,22 +3835,13 @@ Host configuration (§7.1). Every member is OPTIONAL; defaults are the values
 the specification already names and fail closed.
 
 ```typespec
-/**
- * Host configuration (§7.1). Every member is OPTIONAL; defaults are the values
- * the specification already names and fail closed.
- */
 @extension("additionalProperties", false)
 model Configuration {
-  /** §8. */
   @extension("default", "enforce")
   mode?: Mode;
 
   composition?: CompositionConfig;
 
-  /**
-   * §10.1: "jcs-sha256" (the default), a registered custom provider name
-   * (^[a-z][a-z0-9_-]{0,63}$, never a jcs prefix), or null (identity-unbound).
-   */
   @pattern("^(jcs-sha256|(?!jcs)[a-z][a-z0-9_-]{0,63})$")
   identity_provider?: string | null;
 
@@ -4137,11 +3903,6 @@ Type: [`FailureConfig`](#agenthooks-failureconfig).
 ```typespec
 @extension("additionalProperties", false)
 model FailureConfig {
-  /**
-   * §6.3.1. The document default every binding's on_error inherits. deny keeps
-   * the §6.3 substituted deny; continue substitutes an allow carrying
-   * host_warning:control_failed and records the cause in substituted_for.
-   */
   @extension("default", "deny")
   on_error?: OnError;
 }
@@ -4187,10 +3948,8 @@ minItems: `1`; uniqueItems
 OPTIONAL and informative; never checked against code.
 
 ```typespec
-/** OPTIONAL and informative; never checked against code. */
 @extension("additionalProperties", false)
 model Host {
-  /** Same grammar as agent.framework (§4.1). */
   @pattern("^[a-z0-9_-]{1,64}$")
   name: string;
 
@@ -4220,6 +3979,8 @@ minLength: `1`; maxLength: `64`
 
 <a id="agenthooks-hostdeclaration"></a>
 
+Agent Hooks — host declaration document (agent-hooks/draft)
+
 A host declaration document (AGENT-HOOKS-0.1 §7.7): one JSON object that
 fixes a host's configuration (§7.1, §8, §10.1, §13.1), its declared surface
 (§13.1) and its interceptor bindings. The document's spec member selects
@@ -4230,58 +3991,24 @@ express (knob consistency, the §3.2 floor, surface against the host's code,
 registered names) live in the loader (§7.7.6).
 
 ```typespec
-/**
- * A host declaration document (AGENT-HOOKS-0.1 §7.7): one JSON object that
- * fixes a host's configuration (§7.1, §8, §10.1, §13.1), its declared surface
- * (§13.1) and its interceptor bindings. The document's spec member selects
- * its format and behavior; this file describes agent-hooks/draft. Every object is
- * closed except bindings[].config and the values under extensions. This schema
- * is self-contained so a settings validator can use it alone. Rules it cannot
- * express (knob consistency, the §3.2 floor, surface against the host's code,
- * registered names) live in the loader (§7.7.6).
- */
-@summary("Agent Hooks — host declaration document (agent-hooks/draft)")
 @extension("additionalProperties", false)
 model HostDeclaration {
   configuration?: Configuration;
 
-  /**
-   * Ordered: array order is dispatch order. REQUIRED, so an empty-deny host
-   * (zero bindings) is written down rather than arrived at by omission. Binding
-   * ids are unique.
-   */
   @maxItems(256)
   bindings: Binding[];
 
-  /** Ignored by the loader; kept for editors. */
   $schema?: string;
 
-  /**
-   * REQUIRED. The specification version the document is written for
-   * (§7.7.3, §7.7.6): this version's wire string. A document written for a
-   * released version names that version's own string instead, and is
-   * read by that version's rules.
-   */
   spec: "agent-hooks/draft";
 
-  /** OPTIONAL. An operator label for logs. Never stamped on records. */
   @pattern("^[a-z0-9][a-z0-9._-]{0,63}$")
   id?: string;
 
   host?: Host;
 
-  /**
-   * The declared surface (§13.1) in file form. OPTIONAL: when absent the host's
-   * own code surface applies. Every stated member must be a subset of what the
-   * host's code reports; a document a conformance claim cites carries this block
-   * explicitly.
-   */
   surface?: Surface;
 
-  /**
-   * Host-specific extras, kept verbatim and never read by the loader. Keys
-   * follow the §4.6 namespace rule; the §4.6 reserved namespaces apply.
-   */
   extensions?: Extensions;
 }
 ```
@@ -4352,7 +4079,6 @@ Type: [`Extensions`](#agenthooks-extensions).
 The failure posture (§6.3.1).
 
 ```typespec
-/** The failure posture (§6.3.1). */
 enum OnError {
   Deny: "deny",
   Continue: "continue",
@@ -4374,7 +4100,6 @@ Value: `"continue"`.
 ```typespec
 @extension("additionalProperties", false)
 model PostureConfig {
-  /** §13.1. Must equal the posture the host's code implements. */
   @extension("default", "continue")
   tool_seam_host_error?: ToolSeamHostError;
 }
@@ -4399,11 +4124,6 @@ profile consults may appear; an absent knob member means the §7.2 default
 value only.
 
 ```typespec
-/**
- * Profiles and the knob values supported under each (§13.1). Only the knobs a
- * profile consults may appear; an absent knob member means the §7.2 default
- * value only.
- */
 @extension("additionalProperties", false)
 model ProfileSupport {
   `sequential/first_deny`?: FirstDenySupport;
@@ -4438,10 +4158,6 @@ Type: [`UnanimousSupport`](#agenthooks-unanimoussupport).
 ```typespec
 @extension("additionalProperties", false)
 model RecordsConfig {
-  /**
-   * In-memory record buffer bound; null (the default) is unbounded. The maximum
-   * is 2^53 - 1 so the resolved document always canonicalises (§4.4).
-   */
   @minValue(1)
   @maxValue(9007199254740991)
   max_buffered?: integer | null;
@@ -4466,7 +4182,6 @@ minimum: `1`; maximum: `9007199254740991`
 Grammar of a registered name: provider, resolver, redactor or binding id.
 
 ```typespec
-/** Grammar of a registered name: provider, resolver, redactor or binding id. */
 @pattern("^[a-z][a-z0-9_-]{0,63}$")
 scalar Reference extends string;
 ```
@@ -4516,7 +4231,6 @@ minItems: `1`; uniqueItems
 The declared surface (§13.1) in file form, by output posture.
 
 ```typespec
-/** The declared surface (§13.1) in file form, by output posture. */
 union Surface {
   BufferedSurface,
   UnbufferedSurface,
@@ -4532,10 +4246,6 @@ union Surface {
 
 ```typespec
 model SurfaceBase {
-  /**
-   * Points the host emits; always includes agent_startup, input, output and
-   * agent_shutdown (§3.2), and omits the model or tool points only in pairs.
-   */
   @uniqueItems
   @minItems(4)
   @maxItems(8)
@@ -4574,7 +4284,6 @@ Type: [`ProfileSupport`](#agenthooks-profilesupport).
 A bound in milliseconds; null is unbounded.
 
 ```typespec
-/** A bound in milliseconds; null is unbounded. */
 union TimeoutMs {
   BoundedTimeoutMs,
   null,
@@ -4591,10 +4300,8 @@ union TimeoutMs {
 ```typespec
 @extension("additionalProperties", false)
 model TimeoutsConfig {
-  /** §7 interceptor bound; default 5000. null means unbounded and must be written out. */
   interceptor_ms?: TimeoutMs;
 
-  /** §9 resolver bound; defaults to the value of interceptor_ms. */
   approval_resolver_ms?: TimeoutMs;
 }
 ```
@@ -4620,7 +4327,6 @@ Type: [`TimeoutMs`](#agenthooks-timeoutms).
 The tool-seam posture a host implements (§13.1).
 
 ```typespec
-/** The tool-seam posture a host implements (§13.1). */
 enum ToolSeamHostError {
   Continue: "continue",
   Terminate: "terminate",
@@ -4664,18 +4370,12 @@ The surface of a host that streams output (§12.1a): buffered_output is
 written as false and exposure_bound is present.
 
 ```typespec
-/**
- * The surface of a host that streams output (§12.1a): buffered_output is
- * written as false and exposure_bound is present.
- */
 @extension("additionalProperties", false)
 model UnbufferedSurface {
   ...SurfaceBase;
 
-  /** §12.1a. false must be declared explicitly and requires exposure_bound. */
   buffered_output: false;
 
-  /** §12.1a. Present iff buffered_output is false. */
   @minLength(1)
   @maxLength(512)
   exposure_bound: string;

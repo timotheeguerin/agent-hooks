@@ -84,7 +84,11 @@ test("documents generic declarations, concrete envelopes, and inherited and nest
   const declarations = outputs["REFERENCE.md"];
   assert.match(
     declarations,
-    /```typespec\n\/\*\* Generic response wrapper\. \*\/\n\s*model Envelope<T>/,
+    /Generic response wrapper\.\n\n```typespec\nmodel Envelope<T>/,
+  );
+  assert.doesNotMatch(
+    declarations,
+    /```typespec\n[\s\S]*?\/\*\* Generic response wrapper/,
   );
   assert.doesNotMatch(page, /@category\(Categories.Responses\)/);
   assert.match(declarations, /model Response extends Base/);
@@ -137,6 +141,8 @@ test("renders JSON examples, union variants, enums, and Markdown table metachara
     union Selection { Choice, null }
     @category(Categories.Common)
     scalar Identifier extends string;
+    /** Complete request payload. */
+    @summary("A concise request.")
     @example(#{ text: "hello" }, #{ title: "Minimal" })
     @category(Categories.Requests)
     model Request {
@@ -168,6 +174,20 @@ test("renders JSON examples, union variants, enums, and Markdown table metachara
   assert.match(declarations, /union Selection \{ Choice, null \}/);
   assert.match(declarations, /scalar Identifier extends string;/);
   assert.match(declarations, /@example\(/);
+  assert.match(
+    declarations,
+    /A concise request\.\n\nComplete request payload\.\n\n```typespec\n@example\([^)]*\)\n\s*model Request/,
+  );
+  const requestSnippet = declarations.match(
+    /```typespec\n([\s\S]*?)\n```(?=\n\n#### `text`)/,
+  )?.[1];
+  assert.ok(requestSnippet);
+  assert.doesNotMatch(requestSnippet, /\/\*\*/);
+  assert.doesNotMatch(
+    declarations,
+    /```typespec\n[\s\S]*?@summary\("A concise request\."\)/,
+  );
+  assert.doesNotMatch(declarations, /\/\*\* Complete request payload/);
   assert.doesNotMatch(declarations, /@category\(Categories\./);
   assert.match(declarations, /#### `First`\n\nValue: `"a\|b"`\./);
   assert.match(declarations, /Text with a \| separator and `left \| right`\./);

@@ -61,6 +61,8 @@ Additional entries: `unknown`.
 
 <a id="agenthooks-interceptionpoint"></a>
 
+Agent Hooks — interception point
+
 The closed set of agent lifecycle interception points (AGENT-HOOKS-0.1 §3).
 
 | Member | Value | Description |
@@ -148,6 +150,8 @@ Who acts (§4.5).
 ### `AgentContext`
 
 <a id="agenthooks-agentcontext"></a>
+
+Agent Hooks — agent context
 
 Payload a host constructs at each interception point (AGENT-HOOKS-0.1 §4).
 Each variant requires its discriminator and own hook payload, with shared
@@ -765,7 +769,6 @@ additionalProperties: `false`
 Hook response envelope with a hook-specific verdict.
 
 ```typespec
-/** Hook response envelope with a hook-specific verdict. */
 @extension("additionalProperties", false)
 model HookResponse<TVerdict> {
   verdict: TVerdict;
@@ -1016,7 +1019,6 @@ Verdict choices for hooks that do not support transforms.
 transform: proceed with the hook-specific replacement payload.
 
 ```typespec
-/** transform: proceed with the hook-specific replacement payload. */
 @extension("additionalProperties", false)
 model TransformVerdict<TTransform> {
   ...VerdictBase;
@@ -1207,6 +1209,8 @@ An object with no declared properties.
 ### `InterceptionRecord`
 
 <a id="agenthooks-interceptionrecord"></a>
+
+Agent Hooks — interception record
 
 Host-side record of one emission (AGENT-HOOKS-0.1 §10.3). Payload-free:
 identities (when a provider is declared) bind the record to the exact
@@ -1503,6 +1507,8 @@ additionalProperties: `false`
 ### `HostDeclaration`
 
 <a id="agenthooks-hostdeclaration"></a>
+
+Agent Hooks — host declaration document (agent-hooks/draft)
 
 A host declaration document (AGENT-HOOKS-0.1 §7.7): one JSON object that
 fixes a host's configuration (§7.1, §8, §10.1, §13.1), its declared surface

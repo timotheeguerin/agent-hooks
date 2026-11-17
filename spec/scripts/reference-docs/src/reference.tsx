@@ -16,6 +16,7 @@ import {
   getNamespaceFullName,
   getPattern,
   getSourceLocation,
+  getSummary,
   getTypeName,
   isArrayModelType,
   isTemplateInstance,
@@ -28,7 +29,7 @@ import {
   type Type,
 } from "@typespec/compiler";
 import { getExtensions, getUniqueItems, isOneOf } from "@typespec/json-schema";
-import { isCategoryDecorator } from "./category.js";
+import { isCategoryDecorator, isSummaryDecorator } from "./category.js";
 import type { Declaration } from "./index.js";
 
 interface ReferenceProps {
@@ -107,7 +108,9 @@ export function Reference(props: ReferenceProps) {
     const content = type.node?.docs
       ?.flatMap((doc) => doc.content.map((part) => part.text))
       .join("\n");
-    return getDoc(program, type) ?? content ?? "";
+    return [getSummary(program, type), getDoc(program, type) ?? content]
+      .filter((value): value is string => Boolean(value))
+      .join("\n\n");
   }
 
   function typeExpression(type: Type, active = new Set<Type>()): string {
@@ -211,8 +214,52 @@ export function Reference(props: ReferenceProps) {
     }
 
     const ranges = new Map<number, number>();
+    const visited = new Set<object>();
+    function collectComments(value: unknown): void {
+      if (typeof value !== "object" || value === null || visited.has(value)) {
+        return;
+      }
+      visited.add(value);
+      if (Array.isArray(value)) {
+        for (const item of value) collectComments(item);
+        return;
+      }
+      if ("docs" in value && Array.isArray(value.docs)) {
+        for (const comment of value.docs) {
+          if (
+            typeof comment === "object" &&
+            comment !== null &&
+            "pos" in comment &&
+            "end" in comment &&
+            typeof comment.pos === "number" &&
+            typeof comment.end === "number" &&
+            comment.pos >= source.pos &&
+            comment.end <= source.end
+          ) {
+            ranges.set(comment.pos - source.pos, comment.end - source.pos);
+          }
+        }
+      }
+      for (const [key, child] of Object.entries(value)) {
+        if (
+          key !== "docs" &&
+          key !== "parent" &&
+          key !== "symbol" &&
+          key !== "locals"
+        ) {
+          collectComments(child);
+        }
+      }
+    }
+    collectComments(type.node);
     for (const application of type.decorators) {
-      if (!isCategoryDecorator(application) || !application.node) continue;
+      if (
+        (!isCategoryDecorator(application) &&
+          !isSummaryDecorator(application)) ||
+        !application.node
+      ) {
+        continue;
+      }
       const location = getSourceLocation(application.node);
       if (
         !location.isSynthetic &&

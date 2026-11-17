@@ -13,3 +13,12 @@ export function isCategoryDecorator({
     getNamespaceFullName(definition.namespace) === "AgentHooks.Docs"
   );
 }
+
+export function isSummaryDecorator({
+  definition,
+}: DecoratorApplication): boolean {
+  return (
+    definition?.name === "@summary" &&
+    getNamespaceFullName(definition.namespace) === "TypeSpec"
+  );
+}
