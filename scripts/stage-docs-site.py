@@ -8,6 +8,7 @@ spec/<MAJOR.MINOR>/ folder and for spec/draft/ it writes, under
 docs-site/docs/:
 
   spec/<version>.md   one page per released version, from AGENT-HOOKS-<version>.md
+  spec/<version>-reference.md  generated reference, when the bundle has one
   spec/draft.md       the draft, from AGENT-HOOKS-DRAFT.md, its banner link
                       pointed at the version page beside it
   spec.md             the newest released version again, the stable "latest" URL
@@ -196,7 +197,9 @@ def stage_schemas(root: Path, bundles: list[str], schema_out: Path) -> None:
         )
 
 
-def staged_config(config: str, versions: list[str]) -> str:
+def staged_config(
+    config: str, versions: list[str], references: tuple[str, ...] = ()
+) -> str:
     """mkdocs.yml with the Specification entries regenerated: one per
     released version, newest first, then the draft."""
     lines = config.splitlines(keepends=True)
@@ -208,6 +211,8 @@ def staged_config(config: str, versions: list[str]) -> str:
         end += 1
     entries = [f'      - "{v}": spec/{v}.md\n' for v in versions]
     entries.append("      - Draft: spec/draft.md\n")
+    for version in references:
+        entries.append(f'      - "{version} reference": spec/{version}-reference.md\n')
     return "".join(lines[: start + 1] + entries + lines[end:])
 
 
@@ -222,14 +227,26 @@ def stage(root: Path) -> list[str]:
     shutil.rmtree(pages, ignore_errors=True)
     pages.mkdir(parents=True)
     for version in versions:
-        shutil.copyfile(spec_text(spec / version), pages / f"{version}.md")
-    shutil.copyfile(spec_text(spec / versions[0]), docs / "spec.md")
+        text = spec_text(spec / version).read_text(encoding="utf-8")
+        text = text.replace("](REFERENCE.md)", f"]({version}-reference.md)")
+        (pages / f"{version}.md").write_text(text, encoding="utf-8")
+    latest = spec_text(spec / versions[0]).read_text(encoding="utf-8")
+    latest = latest.replace("](REFERENCE.md)", f"](spec/{versions[0]}-reference.md)")
+    (docs / "spec.md").write_text(latest, encoding="utf-8")
     draft = spec_text(spec / "draft").read_text(encoding="utf-8")
     draft = BACK_LINK.sub(r"](\1.md)", draft)
     draft = draft.replace(
         "](schema/path-grammar.abnf)", "](../schema/draft/path-grammar.abnf)"
     )
+    draft = draft.replace("](REFERENCE.md)", "](draft-reference.md)")
     (pages / "draft.md").write_text(draft, encoding="utf-8")
+
+    references = []
+    for version in [*versions, "draft"]:
+        reference = spec / version / "REFERENCE.md"
+        if reference.is_file():
+            shutil.copyfile(reference, pages / f"{version}-reference.md")
+            references.append(version)
 
     schema_out = docs / "schema"
     shutil.rmtree(schema_out, ignore_errors=True)
@@ -239,7 +256,7 @@ def stage(root: Path) -> list[str]:
 
     config = (root / "docs-site" / "mkdocs.yml").read_text(encoding="utf-8")
     (root / "docs-site" / "mkdocs.staged.yml").write_text(
-        staged_config(config, versions), encoding="utf-8"
+        staged_config(config, versions, tuple(references)), encoding="utf-8"
     )
     return versions
 

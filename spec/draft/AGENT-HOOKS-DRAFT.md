@@ -19,6 +19,10 @@
 
 ---
 
+The [generated schema reference](REFERENCE.md) documents the TypeSpec data
+shapes, properties and constraints. The behavioral requirements remain in
+this specification.
+
 ## Table of contents
 
 1. [Introduction](#1-introduction)

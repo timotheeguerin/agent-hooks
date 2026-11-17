@@ -1,0 +1,122 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+import assert from "node:assert/strict";
+import { dirname, resolve } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { createTester } from "@typespec/compiler/testing";
+
+const tester = createTester(
+  resolve(dirname(fileURLToPath(import.meta.url)), "../.."),
+  {
+    libraries: ["@agent-hooks/reference-docs", "@typespec/json-schema"],
+  },
+)
+  .importLibraries()
+  .using("AgentHooks.Docs", "TypeSpec.JsonSchema");
+const emitter = tester.emit("@agent-hooks/reference-docs");
+
+test("groups declarations by enum order and links same-named types by namespace", async () => {
+  const { outputs } = await emitter.compile(`
+    namespace Hooks {
+      @category(Categories.Responses) model Result { request: Requests.Result; }
+    }
+    namespace Requests {
+      @category(Categories.Requests) model Result { id: string; }
+    }
+  `);
+  const page = outputs["REFERENCE.md"];
+  assert.ok(
+    page.indexOf("## Hook requests") < page.indexOf("## Hook responses"),
+  );
+  assert.match(
+    page,
+    /- \[Hook requests\]\(#hook-requests\)\n- \[Hook responses\]/,
+  );
+  assert.match(page, /\[\`Result\`\]\(#requests-result\)/);
+  assert.match(page, /<a id="hooks-result"><\/a>/);
+  assert.match(page, /<a id="requests-result"><\/a>/);
+});
+
+test("documents generic declarations, concrete envelopes, and inherited and nested constraints", async () => {
+  const { outputs } = await emitter.compile(`
+    namespace Test;
+    @category(Categories.Common)
+    enum Kind { Allow: "allow", Deny: "deny" }
+    model Base {
+      /** A machine-readable reason. */
+      @pattern("^(?!host_error:).*")
+      reason?: string | null;
+    }
+    /** Generic response wrapper. */
+    @category(Categories.Responses)
+    model Envelope<T> {
+      value: T;
+    }
+    @category(Categories.Responses)
+    model Response extends Base {
+      kind: Kind;
+      wrapped: Envelope<Kind>;
+      agent: { @minLength(1) id: string; };
+      next?: Response;
+    }
+  `);
+  const page = outputs["REFERENCE.md"];
+  assert.match(page, /### `Envelope<T>`/);
+  assert.match(page, /Generic response wrapper\./);
+  assert.match(page, /\| `value` \| `T` \|/);
+  assert.match(
+    page,
+    /\[\`Envelope\`\]\(#test-envelope\)&lt;\[\`Kind\`\]\(#test-kind\)&gt;/,
+  );
+  assert.match(
+    page,
+    /\| `reason\?` \| `string` &#124; `null` \| A machine-readable reason\./,
+  );
+  assert.match(page, /pattern: `\^\(\?!host_error:\)\.\*`/);
+  assert.match(page, /\| `agent.id` \| `string` \|  \| minLength: `1` \|/);
+  assert.match(page, /\| `next\?` \| \[\`Response\`\]\(#test-response\)/);
+});
+
+test("renders JSON examples, union variants, enums, and Markdown table metacharacters", async () => {
+  const { outputs } = await emitter.compile(`
+    @category(Categories.Common)
+    enum Choice { First: "a|b", Second: "second" }
+    @category(Categories.Common)
+    union Selection { Choice, null }
+    @example(#{ text: "hello" }, #{ title: "Minimal" })
+    @category(Categories.Requests)
+    model Request {
+      /** Text with a | separator and \`left | right\`. */
+      @pattern("^(hello|world)$")
+      text: string;
+      selection?: Selection;
+      choices?: (Choice | null)[];
+    }
+  `);
+  const page = outputs["REFERENCE.md"];
+  assert.match(page, /<code>"a&#124;b"<\/code>/);
+  assert.match(
+    page,
+    /Text with a &#124; separator and <code>left &#124; right<\/code>\./,
+  );
+  assert.match(page, /pattern: <code>\^\(hello&#124;world\)\$<\/code>/);
+  assert.match(page, /- \[\`Choice\`\]\(#choice\)\n- `null`/);
+  assert.match(
+    page,
+    /\| `choices\?` \| \(\[\`Choice\`\]\(#choice\) &#124; `null`\)\[\] \|/,
+  );
+  assert.match(page, /#### Minimal\n\n```json\n{\n  "text": "hello"\n}\n```/);
+});
+
+test("reports an empty selection rather than emitting a success-shaped empty page", async () => {
+  const [result, diagnostics] =
+    await emitter.compileAndDiagnose("model Unlisted {}");
+  assert.deepEqual(Object.keys(result.outputs), []);
+  assert.ok(
+    diagnostics.some(
+      (diagnostic) =>
+        diagnostic.code === "@agent-hooks/reference-docs/no-categories",
+    ),
+  );
+});

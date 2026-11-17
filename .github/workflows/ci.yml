@@ -495,6 +495,9 @@ jobs:
         # with the committed files (spec/scripts/generate-schemas.mts).
         run: npm run check:schema
         working-directory: spec/scripts
+      - name: Reference emitter regression tests and generated docs
+        run: npm run test:reference && npm run check:reference
+        working-directory: spec/scripts
       - name: Released schema bundles match their source
         # The same check for every spec/<MAJOR.MINOR>/ bundle: the frozen
         # source must still generate the frozen output.

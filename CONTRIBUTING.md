@@ -101,6 +101,8 @@ differs from the generated text.
 cd spec/scripts && npm ci
 npm run generate:schema      # write spec/draft/schema/generated/**/*.schema.json
 npm run check:schema         # compile the source, then fail on any drift
+npm run generate:reference   # write spec/draft/REFERENCE.md
+npm run check:reference      # build the emitter, then reject reference drift
 npm run check:schema:equivalence -- --old origin/main   # differential validation against another revision
 ```
 
@@ -126,7 +128,11 @@ every schema and validates the vectors) and the equivalence script
 against `origin/main` to see which instances change verdict.
 
 See [`spec/draft/schema/README.md`](spec/draft/schema/README.md) for the layout and
-the mapping to unchanged published URLs.
+the mapping to unchanged published URLs. The same source generates the
+categorized reference documentation through the local
+`@agent-hooks/reference-docs` emitter. Use `@category(Categories.<member>)`
+from `AgentHooks.Docs` to include a declaration; category labels and order
+come from the shared enum. The prose specification remains handwritten.
 
 ## Local test matrix
 
