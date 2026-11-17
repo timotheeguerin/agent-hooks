@@ -4,7 +4,7 @@ import GithubSlugger from "github-slugger";
 
 function textContent(node) {
   if (node.type === "text") return node.value;
-  if (node.type === "raw") return node.value.replace(/<[^>]*>/g, "");
+  if (node.type === "raw") return "";
   return (node.children ?? []).map(textContent).join("");
 }
 
