@@ -134,6 +134,12 @@ categorized reference documentation through the local
 from `AgentHooks.Docs` to include a declaration; category labels and order
 come from the shared enum. The prose specification remains handwritten.
 
+The documentation site uses Astro Starlight. With Node.js 22.23.4 or later,
+run `npm ci --prefix docs-site` and `npm run dev --prefix docs-site` to preview
+it, or `npm run build --prefix docs-site` to build it. Both commands stage
+the current specification versions, generated references and published schema
+paths before starting.
+
 ## Local test matrix
 
 ```bash

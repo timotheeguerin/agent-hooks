@@ -134,9 +134,10 @@ link to namespace-qualified anchors. Existing `// Example:` comments remain
 source comments; they are not treated as typed examples by this emitter.
 
 The handwritten specification links to the reference, and the Pages staging
-step publishes it beside the prose. The reference does not replace behavioral
-requirements or conformance checks. CI runs `npm run test:reference` and
-`npm run check:reference`; commit both generated pages with their source changes.
+step publishes it beside the prose on the Starlight site. The reference does
+not replace behavioral requirements or conformance checks. CI runs
+`npm run test:reference` and `npm run check:reference`; commit both generated
+pages with their source changes.
 
 ## Filesystem paths are not public schema identities
 

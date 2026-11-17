@@ -62,10 +62,11 @@ recorded in `conformance/CLAIMS.md`. A claim with a `null` identity
 provider must state that its approvals and records are identity-
 unbound.
 
-!!! note "Not a certification"
-    A conformance claim attests that your adapter honours the verdict
-    contract under CTK conditions with mocked model and tools. It is
-    not adversarial testing, it does not prove your production code
-    path matches the harness, and it says nothing about the
-    interceptors you register. The trust model in §1.4 of the
-    specification is normative on this point.
+:::note[Not a certification]
+A conformance claim attests that your adapter honours the verdict
+contract under CTK conditions with mocked model and tools. It is
+not adversarial testing, it does not prove your production code
+path matches the harness, and it says nothing about the
+interceptors you register. The trust model in §1.4 of the
+specification is normative on this point.
+:::

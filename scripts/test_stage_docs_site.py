@@ -22,15 +22,6 @@ stage = importlib.util.module_from_spec(MODULE_SPEC)
 MODULE_SPEC.loader.exec_module(stage)
 
 ID_BASE = "https://responsibleai.github.io/agent-hooks/schema/"
-MKDOCS = """site_name: test
-nav:
-  - Home: index.md
-  # The Specification entries are regenerated at build time.
-  - Specification:
-      - "0.0": spec/0.0.md
-      - Draft: spec/draft.md
-  - FAQ: faq.md
-"""
 
 
 def schema(identity: str, marker: str) -> str:
@@ -106,7 +97,6 @@ class StageTest(unittest.TestCase):
                 encoding="utf-8",
             )
         (self.root / "docs-site/docs").mkdir(parents=True)
-        (self.root / "docs-site/mkdocs.yml").write_text(MKDOCS, encoding="utf-8")
         self.docs = self.root / "docs-site/docs"
 
     def read(self, relative: str) -> str:
@@ -274,24 +264,6 @@ class StageTest(unittest.TestCase):
         with self.assertRaises(SystemExit) as raised:
             stage.stage(self.root)
         self.assertIn("schema is a symbolic link", str(raised.exception))
-
-    def test_navigation_lists_versions_newest_first_then_the_draft(self) -> None:
-        stage.stage(self.root)
-        staged = (self.root / "docs-site/mkdocs.staged.yml").read_text(encoding="utf-8")
-        self.assertEqual(
-            staged,
-            """site_name: test
-nav:
-  - Home: index.md
-  # The Specification entries are regenerated at build time.
-  - Specification:
-      - "0.10": spec/0.10.md
-      - "0.2": spec/0.2.md
-      - "0.1": spec/0.1.md
-      - Draft: spec/draft.md
-  - FAQ: faq.md
-""",
-        )
 
     def test_restaging_replaces_stale_output(self) -> None:
         stage.stage(self.root)

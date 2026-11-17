@@ -1,0 +1,4 @@
+/* Reference anchors follow their headings; keep the heading below the sticky nav. */
+.sl-markdown-content a[id] {
+  scroll-margin-top: 3.5rem;
+}

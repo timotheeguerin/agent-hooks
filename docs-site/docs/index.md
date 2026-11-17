@@ -13,13 +13,14 @@ One Rust core implements everything normative. Python, TypeScript,
 directly, so the same context produces the same canonical bytes and the
 same decisions in all five languages.
 
-!!! warning "Trust model"
-    Agent Hooks is a cooperative contract, not a security boundary.
-    The host is fully trusted: nothing in the contract detects a host
-    that skips interception points or ignores verdicts. Registered
-    interceptors are fully trusted by the host and receive raw
-    payloads. Conformance is not a security certification. The
-    normative statement is [§1.4 of the specification](spec.md).
+:::caution[Trust model]
+Agent Hooks is a cooperative contract, not a security boundary.
+The host is fully trusted: nothing in the contract detects a host
+that skips interception points or ignores verdicts. Registered
+interceptors are fully trusted by the host and receive raw
+payloads. Conformance is not a security certification. The
+normative statement is [§1.4 of the specification](spec.md).
+:::
 
 ## The loop
 
