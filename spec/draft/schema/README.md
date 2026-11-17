@@ -121,7 +121,9 @@ model InputHookTransform {
 
 The `Categories` enum supplies both section labels and section order.
 Declarations are sorted by name within a category. The decorator is
-documentation metadata only and does not change JSON Schema output.
+an experimental TypeSpec auto decorator that stores documentation metadata
+without a JavaScript implementation. Its feature flag is enabled in the
+emitter library's `tspconfig.yaml`; it does not change JSON Schema output.
 The page includes property documentation, optional and nullable types,
 inherited and nested properties, constraints, enum values, union variants,
 generic declarations and type-checked `@example` values. Named type references

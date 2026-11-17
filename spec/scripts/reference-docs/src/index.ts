@@ -4,16 +4,18 @@ import { render, traverseOutput } from "@alloy-js/core";
 import {
   createTypeSpecLibrary,
   emitFile,
+  getAutoDecoratorValue,
+  getNamespaceFullName,
   getTypeName,
   isTemplateInstance,
   isType,
   navigateProgram,
   resolvePath,
-  type DecoratorContext,
   type EmitContext,
   type Enum,
   type EnumMember,
   type Model,
+  type Program,
   type Scalar,
   type Union,
 } from "@typespec/compiler";
@@ -32,38 +34,53 @@ export const $lib = createTypeSpecLibrary({
       },
     },
   },
-  state: {
-    category: { description: "The reference category of a declaration." },
-  },
 });
 
-function $category(
-  context: DecoratorContext,
-  target: Declaration,
-  value: EnumMember,
-): void {
-  context.program.stateMap($lib.stateKeys.category).set(target, value);
+function isEnumMember(value: unknown): value is EnumMember {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "entityKind" in value &&
+    value.entityKind === "Type" &&
+    "kind" in value &&
+    value.kind === "EnumMember"
+  );
 }
 
-export const $decorators = {
-  "AgentHooks.Docs": { category: $category },
-};
+function getCategory(
+  program: Program,
+  type: Declaration,
+): EnumMember | undefined {
+  const stored = getAutoDecoratorValue(
+    program,
+    "AgentHooks.Docs.category",
+    type,
+  );
+  if (stored) {
+    if (!isEnumMember(stored.value)) {
+      throw new Error("The category decorator did not store an enum member.");
+    }
+    return stored.value;
+  }
+
+  // Template declarations retain their decorators without executing them.
+  const application = type.decorators.find(
+    ({ definition }) =>
+      definition?.name === "@category" &&
+      getNamespaceFullName(definition.namespace) === "AgentHooks.Docs",
+  );
+  const argument = application?.args[0]?.value;
+  return argument && isType(argument) && argument.kind === "EnumMember"
+    ? argument
+    : undefined;
+}
 
 export async function $onEmit(context: EmitContext): Promise<void> {
   const { program } = context;
   const declarations = new Map<Declaration, EnumMember>();
   function collect(type: Declaration): void {
     if (!type.name || isTemplateInstance(type)) return;
-    const application = type.decorators.find(
-      (application) => application.decorator === $category,
-    );
-    const argument = application?.args[0]?.value;
-    // Template declarations retain their decorators without executing them.
-    const category: EnumMember | undefined =
-      program.stateMap($lib.stateKeys.category).get(type) ??
-      (argument && isType(argument) && argument.kind === "EnumMember"
-        ? argument
-        : undefined);
+    const category = getCategory(program, type);
     if (category) declarations.set(type, category);
   }
   navigateProgram(

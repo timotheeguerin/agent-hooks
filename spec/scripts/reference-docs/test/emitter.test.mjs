@@ -78,6 +78,33 @@ test("documents generic declarations, concrete envelopes, and inherited and nest
   assert.match(page, /\| `next\?` \| \[\`Response\`\]\(#test-response\)/);
 });
 
+test("ignores another namespace's category decorator on a generic declaration", async () => {
+  const collisionTester = createTester(
+    resolve(dirname(fileURLToPath(import.meta.url)), "../.."),
+    {
+      libraries: ["@agent-hooks/reference-docs", "@typespec/json-schema"],
+      features: ["auto-decorators"],
+    },
+  )
+    .importLibraries()
+    .using("AgentHooks.Docs", "TypeSpec.JsonSchema")
+    .emit("@agent-hooks/reference-docs");
+  const { outputs } = await collisionTester.compile(`
+    namespace Other {
+      auto dec category(target: TypeSpec.Reflection.Model, value: AgentHooks.Docs.Categories);
+    }
+    @Other.category(Categories.Responses)
+    @category(Categories.Requests)
+    model Listed<T> { value: T; }
+    @Other.category(Categories.Responses)
+    model Unrelated<T> { value: T; }
+  `);
+  assert.match(outputs["REFERENCE.md"], /## Hook requests/);
+  assert.doesNotMatch(outputs["REFERENCE.md"], /## Hook responses/);
+  assert.match(outputs["REFERENCE.md"], /### `Listed<T>`/);
+  assert.doesNotMatch(outputs["REFERENCE.md"], /### `Unrelated<T>`/);
+});
+
 test("renders JSON examples, union variants, enums, and Markdown table metacharacters", async () => {
   const { outputs } = await emitter.compile(`
     @category(Categories.Common)

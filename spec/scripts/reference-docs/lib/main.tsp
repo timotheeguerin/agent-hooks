@@ -16,7 +16,7 @@ enum Categories {
 }
 
 /** Include a declaration in the reference under the selected section. */
-extern dec category(
+auto dec category(
   target:
     | TypeSpec.Reflection.Model
     | TypeSpec.Reflection.Enum
