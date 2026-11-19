@@ -3,11 +3,13 @@
 
 """Stage the specification bundles into the documentation site.
 
-The pages workflow runs this before mkdocs. For every
+The Starlight build runs this before staging its content. For every
 spec/<MAJOR.MINOR>/ folder and for spec/draft/ it writes, under
 docs-site/docs/:
 
   spec/<version>.md   one page per released version, from AGENT-HOOKS-<version>.md
+  spec/<version>-reference.md  generated reference, when the bundle has one
+  spec/<version>-reference-tables.md  table comparison, when present
   spec/draft.md       the draft, from AGENT-HOOKS-DRAFT.md, its banner link
                       pointed at the version page beside it
   spec.md             the newest released version again, the stable "latest" URL
@@ -18,9 +20,7 @@ docs-site/docs/:
                       root schemas; and each conformance/<version>/vectors.schema.json
                       at its own $id path
 
-and docs-site/mkdocs.staged.yml: the committed mkdocs.yml with the
-Specification navigation entries generated from the same folders, newest
-first, then the draft. Nothing it writes is committed.
+Nothing it writes is committed.
 
 A published path is immutable: two bundles may stage the same path only
 with identical bytes, so a release that changes a schema must publish
@@ -47,7 +47,6 @@ VERSION = re.compile(r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)")
 BACK_LINK = re.compile(
     r"\]\(\.\./((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))/AGENT-HOOKS-\1\.md\)"
 )
-NAV_HEAD = "  - Specification:\n"
 INVENTORIES = (
     "reserved-reasons.json",
     "reserved-warnings.json",
@@ -196,21 +195,6 @@ def stage_schemas(root: Path, bundles: list[str], schema_out: Path) -> None:
         )
 
 
-def staged_config(config: str, versions: list[str]) -> str:
-    """mkdocs.yml with the Specification entries regenerated: one per
-    released version, newest first, then the draft."""
-    lines = config.splitlines(keepends=True)
-    if NAV_HEAD not in lines:
-        raise SystemExit("docs-site/mkdocs.yml has no '  - Specification:' nav entry")
-    start = lines.index(NAV_HEAD)
-    end = start + 1
-    while end < len(lines) and lines[end].startswith("      "):
-        end += 1
-    entries = [f'      - "{v}": spec/{v}.md\n' for v in versions]
-    entries.append("      - Draft: spec/draft.md\n")
-    return "".join(lines[: start + 1] + entries + lines[end:])
-
-
 def stage(root: Path) -> list[str]:
     spec = root / "spec"
     docs = root / "docs-site" / "docs"
@@ -222,14 +206,30 @@ def stage(root: Path) -> list[str]:
     shutil.rmtree(pages, ignore_errors=True)
     pages.mkdir(parents=True)
     for version in versions:
-        shutil.copyfile(spec_text(spec / version), pages / f"{version}.md")
-    shutil.copyfile(spec_text(spec / versions[0]), docs / "spec.md")
+        text = spec_text(spec / version).read_text(encoding="utf-8")
+        text = text.replace("](REFERENCE.md)", f"]({version}-reference.md)")
+        (pages / f"{version}.md").write_text(text, encoding="utf-8")
+    latest = spec_text(spec / versions[0]).read_text(encoding="utf-8")
+    latest = latest.replace("](REFERENCE.md)", f"](spec/{versions[0]}-reference.md)")
+    (docs / "spec.md").write_text(latest, encoding="utf-8")
     draft = spec_text(spec / "draft").read_text(encoding="utf-8")
     draft = BACK_LINK.sub(r"](\1.md)", draft)
     draft = draft.replace(
         "](schema/path-grammar.abnf)", "](../schema/draft/path-grammar.abnf)"
     )
+    draft = draft.replace("](REFERENCE.md)", "](draft-reference.md)")
     (pages / "draft.md").write_text(draft, encoding="utf-8")
+
+    for version in [*versions, "draft"]:
+        reference = spec / version / "REFERENCE.md"
+        if reference.is_file():
+            text = reference.read_text(encoding="utf-8").replace(
+                "](REFERENCE-TABLES.md)", f"]({version}-reference-tables.md)"
+            )
+            (pages / f"{version}-reference.md").write_text(text, encoding="utf-8")
+        table_reference = spec / version / "REFERENCE-TABLES.md"
+        if table_reference.is_file():
+            shutil.copyfile(table_reference, pages / f"{version}-reference-tables.md")
 
     schema_out = docs / "schema"
     shutil.rmtree(schema_out, ignore_errors=True)
@@ -237,10 +237,6 @@ def stage(root: Path) -> list[str]:
     # bundle that arrived later.
     stage_schemas(root, [*reversed(versions), "draft"], schema_out)
 
-    config = (root / "docs-site" / "mkdocs.yml").read_text(encoding="utf-8")
-    (root / "docs-site" / "mkdocs.staged.yml").write_text(
-        staged_config(config, versions), encoding="utf-8"
-    )
     return versions
 
 

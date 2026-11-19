@@ -43,6 +43,8 @@ cd spec/scripts
 npm ci
 npm run generate:schema
 npm run check:schema
+npm run generate:reference
+npm run check:reference
 npm run check:schema:equivalence -- --old <git-ref>
 npm run check:schema:equivalence -- --old <git-ref> --structural-diff
 ```
@@ -92,6 +94,50 @@ language SDKs. JSON Schema remains the normative artifact. The Python
 mirror remains versioned under `schema/0.1/` and `schema/draft/`; update
 draft copies only alongside corresponding SDK changes, as described in
 [Contributing](../../../CONTRIBUTING.md#schema-source).
+
+## Generated reference documentation
+
+The local `@agent-hooks/reference-docs` emitter produces
+[`../REFERENCE.md`](../REFERENCE.md) from the same TypeSpec program, using
+`@alloy-js/markdown` components. Each declaration has a TypeSpec source
+excerpt followed by individual member documentation. The existing
+[table representation](../REFERENCE-TABLES.md) is also generated for comparison.
+`npm ci` builds the emitter; the reference
+generation and check commands rebuild it after source changes.
+It follows [TypeSpec's tspd](https://github.com/microsoft/typespec/tree/main/packages/tspd)
+approach of extracting compiler metadata and composing reference sections,
+without depending on its experimental documentation CLI.
+
+Reference categories are declared once in
+`spec/scripts/reference-docs/lib/main.tsp`. Each model, enum, union or scalar
+opts in with a typed decorator:
+
+```typespec
+using AgentHooks.Docs;
+
+/** Replaces the complete input payload. */
+@category(Categories.Responses)
+model InputHookTransform {
+  input: InputRequest.input;
+}
+```
+
+The `Categories` enum supplies both section labels and section order.
+Declarations are sorted by name within a category. The decorator is
+an experimental TypeSpec auto decorator that stores documentation metadata
+without a JavaScript implementation. Its feature flag is enabled in the
+emitter library's `tspconfig.yaml`; it does not change JSON Schema output.
+The page includes property documentation, optional and nullable types,
+inherited and nested properties, constraints, enum values, union variants,
+generic declarations and type-checked `@example` values. Named type references
+link to namespace-qualified anchors. Existing `// Example:` comments remain
+source comments; they are not treated as typed examples by this emitter.
+
+The handwritten specification links to the reference, and the Pages staging
+step publishes it beside the prose on the Starlight site. The reference does
+not replace behavioral requirements or conformance checks. CI runs
+`npm run test:reference` and `npm run check:reference`; commit both generated
+pages with their source changes.
 
 ## Filesystem paths are not public schema identities
 

@@ -2,11 +2,19 @@
   "name": "agent-hooks-spec-scripts",
   "private": true,
   "scripts": {
+    "prepare": "npm run build:reference",
+    "build:reference": "npm --prefix reference-docs run build",
+    "generate:reference": "npm run build:reference && tsx generate-reference.mts",
+    "check:reference": "npm run build:reference && tsx generate-reference.mts --check",
+    "test:reference": "npm run build:reference && node --test reference-docs/test/*.test.mjs",
     "generate:schema": "tsx generate-schemas.mts",
     "check:schema": "tsx generate-schemas.mts --check",
     "check:schema:equivalence": "tsx schema-equivalence.mts"
   },
   "devDependencies": {
+    "@agent-hooks/reference-docs": "file:reference-docs",
+    "@alloy-js/cli": "0.26.0",
+    "@types/node": "22.20.5",
     "@typespec/compiler": "1.18.0",
     "@typespec/json-schema": "1.18.0",
     "ajv": "8.20.0",
